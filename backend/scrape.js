@@ -1,12 +1,13 @@
 const { Builder, By, until } = require("selenium-webdriver");
+const { MongoClient } = require("mongodb");
+require('dotenv').config();
+
 
 
 async function getClasses(){
     const driver = await new Builder().forBrowser('chrome').build();
 
     await driver.get('https://courses.wustl.edu/Semester/Listing.aspx');
-
-
 
     //----------go through each school----------
     const schoolXPath = '//*[@id="Body_upSearchBoxes"]/div/div[1]/div';
@@ -15,7 +16,7 @@ async function getClasses(){
     const numSchoolLinks = schoolLinks.length;
 
     const schools = [];
-    for(let i=0; i<3; i++){
+    for(let i=0; i<1; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -86,6 +87,33 @@ async function getClasses(){
     return schools;
 }
 
-module.exports = { getClasses };
-//getClasses();
+
+
+
+// Replace the uri string with your connection string.
+const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+const client = new MongoClient(uri);
+
+async function run() {
+  try {
+
+    const courses = await getClasses();
+
+    const database = client.db('sample_mflix');
+    const movies = database.collection('movies');
+
+    // Query for a movie that has the title 'Back to the Future'
+    const query = { title: 'Back to the Future' };
+    const movie = await movies.findOne(query);
+
+    console.log(movie);
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+
+
+run().catch(console.dir);
 
