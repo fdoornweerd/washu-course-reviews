@@ -6,7 +6,7 @@ async function getClasses(){
 
     await driver.get('https://courses.wustl.edu/Semester/Listing.aspx');
 
-    const data = [];
+
 
     //----------go through each school----------
     const schoolXPath = '//*[@id="Body_upSearchBoxes"]/div/div[1]/div';
@@ -14,12 +14,12 @@ async function getClasses(){
     let schoolLinks = await schoolContainer.findElements(By.css('a'));
     const numSchoolLinks = schoolLinks.length;
 
-    for(let i=0; i<numSchoolLinks; i++){
+    const schools = [];
+    for(let i=0; i<3; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
 
-        const schoolDepts = [];
         const currLinkS = schoolLinks[i];
         const schoolName = await currLinkS.getText();
 
@@ -39,6 +39,7 @@ async function getClasses(){
     
             const currLinkD = deptLinks[j];
             const deptName = await currLinkD.getText();
+            const classes = [];
             if(deptName != 'All Departments(All)'){
                 await currLinkD.click();
 
@@ -59,9 +60,8 @@ async function getClasses(){
                 const numClassLinks = classLinks.length;
 
 
-                const classes = [];
+                
                 for(let k=0; k<numClassLinks; k++){
-
                     // update so links dont become stale
                     classContainer = await driver.findElement(By.xpath(classXPath));
                     classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
@@ -75,20 +75,17 @@ async function getClasses(){
                     const className = await classNameLink.getText();
                     
                     console.log(`${codeName} ${className}`);
-                    
-
+                    classes.push([codeName,className]);
                 }
-
+                departments.push([deptName, classes]);
             }
-            
-    
         }
-
-        
+        schools.push([schoolName,departments]);
     }
 
-
+    return schools;
 }
 
-getClasses();
+module.exports = { getClasses };
+//getClasses();
 
