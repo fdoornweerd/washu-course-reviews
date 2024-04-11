@@ -1,7 +1,9 @@
 const { MongoClient } = require("mongodb");
 require('dotenv').config();
 
-export async function getSchools(){
+
+
+async function getSchools(){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -12,7 +14,7 @@ export async function getSchools(){
         return await courses.distinct('school');
     
     } catch (err){
-        console.error('Error fetching unique departments:', err);
+        console.error('Error fetching schools:', err);
         return [];
     } finally {
         await client.close();
@@ -21,7 +23,7 @@ export async function getSchools(){
 
 
 
-export async function getDepartments(school){
+async function getDepartments(school){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -33,7 +35,7 @@ export async function getDepartments(school){
         return await courses.distinct('department',filter);
     
     } catch (err){
-        console.error('Error fetching unique departments:', err);
+        console.error('Error fetching departments:', err);
         return [];
     } finally {
         await client.close();
@@ -41,8 +43,8 @@ export async function getDepartments(school){
 }
 
 
-// make the department 'all' to get all courses (for search feature)
-export async function getCourses(department){
+// make the department 'all' to get all courses
+async function getCourses(department){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -58,7 +60,48 @@ export async function getCourses(department){
         
     
     } catch (err){
-        console.error('Error fetching unique departments:', err);
+        console.error('Error fetching courses:', err);
+        return [];
+    } finally {
+        await client.close();
+    }
+}
+
+// searches courses for either the name of the course or course code
+// if searching all classes, put department as 'all'
+async function searchCourses(department, searchTerm){
+    const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+    const client = new MongoClient(uri);
+    const database = client.db('class-critique');
+    const courses = database.collection('courses');
+
+    try{
+        const regex = new RegExp(searchTerm, 'i');
+        
+
+        if(department == 'all'){
+            const results = await courses.find({
+                $or: [
+                    { name: {$regex: regex}},
+                    { code: {$regex: regex}}
+                ]
+            }).toArray();
+
+            return results;
+        } else{
+            const results = await courses.find({
+                $or: [
+                    { name: {$regex: regex}},
+                    { code: {$regex: regex}}
+                ],
+                department: department
+            }).toArray();
+
+            return results;
+        }
+    } catch (err){
+        console.error('Error searching:', err);
         return [];
     } finally {
         await client.close();
@@ -69,22 +112,10 @@ export async function getCourses(department){
 
 
 module.exports = {
-    getSchools: getSchools,
-    getDepartments: getDepartments,
-    getCourses: getCourses,
-
+    getSchools,
+    getDepartments,
+    getCourses,
+    searchCourses
 };
 
 
-// FOR TESTING
-// to test just dont make them export (just async functions)
-
-// async function test() {
-//     try {
-//         const schools = await getCourses('URBAN DESIGN(A49)');
-//         console.log(schools);
-//     } catch (error) {
-//         console.error('Error:', error);
-//     }
-// }
-// test();
