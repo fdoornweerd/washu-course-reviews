@@ -9,6 +9,31 @@ async function getClasses(){
 
     await driver.get('https://courses.wustl.edu/Semester/Listing.aspx');
 
+    const schoolsAllowed = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
+
+
+    //select semester to update (0 is most recent option)
+    const SEMESTERS_BACK = 0;
+    const adjusted = 2*SEMESTERS_BACK + 1;
+
+    if(SEMESTERS_BACK < 4){
+        const semesterBtn = await driver.findElement(By.css('[id="Body_UpdatePanel1"] > a:nth-child('+adjusted+')'));
+        await semesterBtn.click();
+        await driver.sleep(1000);
+    } else{
+        const moreBtn = await driver.findElement(By.css('[id="Body_hlMoreSemesters"]'));
+        await moreBtn.click();
+        await driver.sleep(1000);
+
+        const semesterBtn = await driver.findElement(By.css('[id="Body_divMoreSems"] > a:nth-child('+(adjusted-8)+')'));
+        await semesterBtn.click();
+        await driver.sleep(2000);
+    }
+
+
+    
+
+    
     //----------go through each school----------
     const schoolXPath = '//*[@id="Body_upSearchBoxes"]/div/div[1]/div';
     let schoolContainer = await driver.findElement(By.xpath(schoolXPath));
@@ -24,6 +49,10 @@ async function getClasses(){
 
         const currLinkS = schoolLinks[i];
         const schoolName = await currLinkS.getText();
+
+        if(!schoolsAllowed.includes(schoolName)){
+            continue;
+        }
 
         await currLinkS.click();
 
