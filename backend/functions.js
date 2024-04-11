@@ -2,7 +2,7 @@ const { MongoClient } = require("mongodb");
 require('dotenv').config();
 
 
-
+// returns all schools in database
 async function getSchools(){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -22,7 +22,7 @@ async function getSchools(){
 }
 
 
-
+// returns all departments for a school in database
 async function getDepartments(school){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -42,7 +42,7 @@ async function getDepartments(school){
     }
 }
 
-
+// returns all courses in a department
 // make the department 'all' to get all courses
 async function getCourses(department){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -107,6 +107,13 @@ async function searchCourses(department, searchTerm){
         await client.close();
     }
 }
+
+
+
+async function inputScore(){
+
+}
+
 
 
 

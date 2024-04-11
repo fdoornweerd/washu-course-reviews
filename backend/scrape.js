@@ -31,9 +31,6 @@ async function getClasses(){
     }
 
 
-    
-
-    
     //----------go through each school----------
     const schoolXPath = '//*[@id="Body_upSearchBoxes"]/div/div[1]/div';
     let schoolContainer = await driver.findElement(By.xpath(schoolXPath));
@@ -130,7 +127,12 @@ async function getClasses(){
                             "name": className,
                             "department": deptName,
                             "school": schoolName,
-                            "instructors": instructorNames
+                            "instructors": instructorNames,
+                            "numScores": 0,
+                            "meanScore": -1,
+                            "minInstructorScore": -1,
+                            "maxInstructorScore": -1,
+                            "reviews": []
                         }
                     );
                 }
@@ -182,10 +184,10 @@ async function run() {
 
 
   } finally {
-    // Ensures that the client will close when you finish/error
     await client.close();
   }
 }
+
 
 
 run().catch(console.dir);
