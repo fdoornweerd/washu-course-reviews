@@ -6,7 +6,7 @@ const port = 3456;
 
 
 app.get('/', async (req, res) => {
-    res.send("hello world")
+    res.send("Hello World!")
 });
 
 app.listen(port, () => {
