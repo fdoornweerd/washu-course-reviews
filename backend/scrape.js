@@ -15,8 +15,9 @@ async function getClasses(){
     let schoolLinks = await schoolContainer.findElements(By.css('a'));
     const numSchoolLinks = schoolLinks.length;
 
-    const schools = [];
-    for(let i=0; i<1; i++){
+    const jsonData = [];
+
+    for(let i=0; i<3; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -32,7 +33,7 @@ async function getClasses(){
         let deptLinks = await deptContainer.findElements(By.css('a'));
         const numDeptLinks = deptLinks.length;
 
-        const departments = [];
+
         for(let j=0; j<numDeptLinks; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
@@ -40,7 +41,7 @@ async function getClasses(){
     
             const currLinkD = deptLinks[j];
             const deptName = await currLinkD.getText();
-            const classes = [];
+
             if(deptName != 'All Departments(All)'){
                 await currLinkD.click();
 
@@ -76,15 +77,21 @@ async function getClasses(){
                     const className = await classNameLink.getText();
                     
                     console.log(`${codeName} ${className}`);
-                    classes.push([codeName,className]);
+
+                    jsonData.push(
+                        {
+                            "code": codeName,
+                            "name": className,
+                            "department": deptName,
+                            "school": schoolName
+                        }
+                    );
                 }
-                departments.push([deptName, classes]);
             }
         }
-        schools.push([schoolName,departments]);
     }
 
-    return schools;
+    return jsonData;
 }
 
 
@@ -98,16 +105,21 @@ const client = new MongoClient(uri);
 async function run() {
   try {
 
-    const courses = await getClasses();
+    const coursesData = await getClasses();
 
-    const database = client.db('sample_mflix');
-    const movies = database.collection('movies');
+    // insert into db
+    const database = client.db('class-critique');
+    const courses = database.collection('courses');
 
-    // Query for a movie that has the title 'Back to the Future'
-    const query = { title: 'Back to the Future' };
-    const movie = await movies.findOne(query);
+    for(const course of coursesData){
+        const existingCourse = await courses.findOne({ code: course.code });
+        if(!existingCourse){
+            const result = await courses.insertOne(course);
+            console.log(`Inserted course: ${course.code} - ${course.name} - ${course.department}`);
+        }
+    }
 
-    console.log(movie);
+
   } finally {
     // Ensures that the client will close when you finish/error
     await client.close();
