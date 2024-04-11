@@ -17,7 +17,7 @@ async function getClasses(){
 
     const jsonData = [];
 
-    for(let i=0; i<3; i++){
+    for(let i=0; i<1; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -34,7 +34,7 @@ async function getClasses(){
         const numDeptLinks = deptLinks.length;
 
 
-        for(let j=0; j<numDeptLinks; j++){
+        for(let j=0; j<2; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
             deptLinks = await deptContainer.findElements(By.css('a'));
@@ -63,7 +63,7 @@ async function getClasses(){
 
 
                 
-                for(let k=0; k<numClassLinks; k++){
+                for(let k=0; k<3; k++){
                     // update so links dont become stale
                     classContainer = await driver.findElement(By.xpath(classXPath));
                     classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
@@ -72,18 +72,36 @@ async function getClasses(){
 
                     const classCodeLink = await currLinkC.findElement(By.css('table > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(1) > a'));
                     const classNameLink = await currLinkC.findElement(By.css('table > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > a'));
-
                     const codeName = await classCodeLink.getText();
                     const className = await classNameLink.getText();
+
+                        
+                    const instructorContainer = await currLinkC.findElement(By.css('div.ResultTable > table > tbody > tr > td:nth-child(2) > div > table > tbody > tr:nth-child(1) > td:nth-child(6)'));
+                    const instructorLink = await instructorContainer.findElements(By.css('a'));
+
+                    let instructorNames = [];
                     
-                    console.log(`${codeName} ${className}`);
+                    if(instructorLink.length > 0){
+                        for (const instructor of instructorLink) {
+                            instructorNames.push(await instructor.getText());
+                        }
+                    } else{
+                        // if instructor is [TBD] there won't be an <a> element
+
+                        // for now dont do anything with [TBD Values]
+                        // instructorNames.push(await instructorContainer.getText());
+                    }
+
+
+                    console.log(`${codeName} ${className} ${instructorNames}`);
 
                     jsonData.push(
                         {
                             "code": codeName,
                             "name": className,
                             "department": deptName,
-                            "school": schoolName
+                            "school": schoolName,
+                            "instructors": instructorNames
                         }
                     );
                 }
@@ -116,6 +134,20 @@ async function run() {
         if(!existingCourse){
             const result = await courses.insertOne(course);
             console.log(`Inserted course: ${course.code} - ${course.name} - ${course.department}`);
+        } else{
+           const instructorInDB = existingCourse.instructors;
+           const newInstructors = course.instructors.filter(el => !instructorInDB.includes(el));
+           const updatedInstructors = newInstructors.concat(instructorInDB);
+           
+           if(newInstructors.length > 0){
+                const filter = { code: course.code };
+                const update = {
+                    $set: { instructors: updatedInstructors }
+                };
+                const updateResult = await courses.updateOne(filter, update);
+
+                console.log(`Updated course instructors for: ${course.code} - ${course.name} - ${course.department} - ${updatedInstructors}`);
+           }
         }
     }
 
