@@ -110,8 +110,11 @@ async function searchCourses(department, searchTerm){
 
 
 
-async function inputScore(){
-
+function getProfessorLink(fullName){
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts[1];
+    return `https://www.ratemyprofessors.com/search/professors/1147?q=${firstName}%20${lastName}`;
 }
 
 
@@ -122,7 +125,8 @@ module.exports = {
     getSchools,
     getDepartments,
     getCourses,
-    searchCourses
+    searchCourses,
+    getProfessorLink
 };
 
 
