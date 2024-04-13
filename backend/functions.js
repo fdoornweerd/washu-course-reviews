@@ -7,7 +7,7 @@ async function getSchools(){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
-    const database = client.db('class-critique');
+    const database = client.db('RateMyCourse');
     const courses = database.collection('courses');
 
     try{
@@ -27,7 +27,7 @@ async function getDepartments(school){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
-    const database = client.db('class-critique');
+    const database = client.db('RateMyCourse');
     const courses = database.collection('courses');
 
     try{
@@ -48,7 +48,7 @@ async function getCourses(department){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
-    const database = client.db('class-critique');
+    const database = client.db('RateMyCourse');
     const courses = database.collection('courses');
 
     try{
@@ -73,7 +73,7 @@ async function searchCourses(department, searchTerm){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
-    const database = client.db('class-critique');
+    const database = client.db('RateMyCourse');
     const courses = database.collection('courses');
 
     try{
@@ -121,6 +121,59 @@ function getProfessorLink(fullName){
 
 
 
+// TODO: figure out how to grab dateposted and how to track userID so they cant comment a lot (once per session or something?)
+async function insertReview(quality, difficulty, instructor, grade, comment, datePosted, userIDThing, courseCode){
+    const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+    const client = new MongoClient(uri);
+    const database = client.db('RateMyCourse');
+    const courses = database.collection('courses');
+
+    JSON_review = {
+        "quality": quality,
+        "difficulty": difficulty,
+        "instructor": instructor,
+        "grade": grade,
+        "comment": comment,
+        "date": datePosted,
+        "idThing": userIDThing, //TODO: change
+    }
+
+    const result = await courses.updateOne(
+        { code: courseCode },
+        { $push: 
+            { reviews: JSON_review} 
+        }
+    );
+
+    await client.close();
+
+    return result.acknowledged;
+}
+
+// set instructor to 'all' if getting all reviews
+async function fetchReviews(courseCode, instructor){
+    const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+    const client = new MongoClient(uri);
+    const database = client.db('RateMyCourse');
+    const courses = database.collection('courses');
+
+    const result = await courses.findOne(
+        {code: courseCode}
+    )
+    let reviews = result.reviews || [];
+    if(instructor == 'all'){
+        await client.close();
+        return reviews;
+    } else {
+        const filteredReviews = reviews.filter(el => el.instructor == instructor);
+        await client.close();
+        return filteredReviews;
+    }
+}
+
+
 
 
 module.exports = {
@@ -128,7 +181,9 @@ module.exports = {
     getDepartments,
     getCourses,
     searchCourses,
-    getProfessorLink
+    getProfessorLink,
+    insertReview,
+    fetchReviews
 };
 
 

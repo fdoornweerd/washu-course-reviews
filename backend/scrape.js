@@ -204,7 +204,7 @@ async function run() {
     const coursesData = await getClasses();
     
     // insert courses into db
-    const database = client.db('class-critique');
+    const database = client.db('RateMyCourse');
     const courses = database.collection('courses');
 
     // go through each course
