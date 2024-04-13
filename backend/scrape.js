@@ -18,8 +18,11 @@ async function getClasses(){
     const adjusted = 2*SEMESTERS_BACK + 1;
 
     // click on semester to scrape
+    let semester;
+
     if(SEMESTERS_BACK < 4){
         const semesterBtn = await driver.findElement(By.css('[id="Body_UpdatePanel1"] > a:nth-child('+adjusted+')'));
+        semester = await semesterBtn.getText();
         await semesterBtn.click();
         await driver.sleep(1000);
     } else{
@@ -28,6 +31,7 @@ async function getClasses(){
         await driver.sleep(1000);
 
         const semesterBtn = await driver.findElement(By.css('[id="Body_divMoreSems"] > a:nth-child('+(adjusted-8)+')'));
+        semester = await semesterBtn.getText();
         await semesterBtn.click();
         await driver.sleep(2000);
     }
@@ -41,7 +45,7 @@ async function getClasses(){
 
     const jsonData = [];
 
-    for(let i=0; i<3; i++){
+    for(let i=0; i<1; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -64,7 +68,7 @@ async function getClasses(){
         const numDeptLinks = deptLinks.length;
 
 
-        for(let j=0; j<numDeptLinks; j++){
+        for(let j=0; j<2; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
             deptLinks = await deptContainer.findElements(By.css('a'));
@@ -146,20 +150,18 @@ async function getClasses(){
                                     await driver.switchTo().window(windowHandles[windowHandles.length - 1]);
                                 
 
-
-    
-                                    //get FULL instructor name                    oInstructorResults_lblInstructorName
+                                    //get FULL instructor name 
                                     const element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
                                     const fullName = await element.getText();
                         
-                                
+                                    // close current window
                                     await driver.close();
                                     
+                                    // switch back to courses
                                     await driver.switchTo().window(windowHandles[0]); 
                                     
-        
-                                    
-                                    instructorNames.push([instructorLastName,fullName]);
+                                    // add instructor
+                                    instructorNames.push({"lastName":instructorLastName,"fullName":fullName});
                                 }
                             }
                         }
@@ -175,6 +177,7 @@ async function getClasses(){
                             "department": deptName,
                             "school": schoolName,
                             "instructors": instructorNames,
+                            "lastOffered": semester,
                             "numScores": 0,
                             "meanScore": -1,
                             "minInstructorScore": -1,
@@ -204,28 +207,65 @@ async function run() {
     const database = client.db('class-critique');
     const courses = database.collection('courses');
 
+    // go through each course
     for(const course of coursesData){
-        const existingCourse = await courses.findOne({ code: course.code });
+        // get course from database with unqiue course code
+        const courseFilter = { code: course.code }
+        const existingCourse = await courses.findOne(courseFilter);
         if(!existingCourse){
+            // if it doesnt exist insert it
             const result = await courses.insertOne(course);
             console.log(`Inserted course: ${course.code} - ${course.name} - ${course.department}`);
         } else{
-            // add instructors
+            // check for instructors associated with the course who may have started teaching it
            const instructorInDB = existingCourse.instructors;
-           const newInstructors = course.instructors.filter(el => !instructorInDB.some(dbEl => dbEl[0] === el[0] && dbEl[1] === el[1]));
+           const newInstructors = course.instructors.filter(el => !instructorInDB.some(dbEl => dbEl.lastName === el.lastName && dbEl.fullName === el.fullName));
            const updatedInstructors = newInstructors.concat(instructorInDB);
 
            if(newInstructors.length > 0){
-                const filter = { code: course.code };
+            // insert new instructors
                 const update = {
                     $set: { 
                         instructors: updatedInstructors,
                         }
                 };
-                const updateResult = await courses.updateOne(filter, update);
+                const updateResult = await courses.updateOne(courseFilter, update);
 
-                console.log(`Updated course instructors for: ${course.code} - ${course.name} - ${course.department} - ${newInstructors}`);
+                let logOutput = "";
+                newInstructors.forEach(instructor => {
+                    logOutput+=(instructor.lastName+" ");
+                });
+                console.log(`Updated course instructors for: ${course.code} - ${course.name} - ${course.department} - ${logOutput}`);
            }
+
+           //check if course was offered more recently
+           const semesterDB = existingCourse.lastOffered;
+           const semesterTypeDB = semesterDB.substring(0, 2); 
+           const yearDB = parseInt(semesterDB.substring(2));
+
+           const semesterIncoming = course.lastOffered;
+           const semesterTypeIncoming = semesterIncoming.substring(0, 2); 
+           const yearIncoming = parseInt(semesterIncoming.substring(2));
+           
+           if(yearIncoming > yearDB){
+            // more recent year
+                const update = {
+                    $set: {lastOffered: semesterIncoming}
+                }
+                const updateResult = await courses.updateOne(courseFilter, update);
+                console.log(`Updated most recently offered course for ${course.code} - ${course.name} - ${course.department} - ${semesterIncoming}`);
+           } else if(yearIncoming == yearDB){
+                const semesterOrder = ["SP","SU","FL"];
+                if(semesterOrder.indexOf(semesterTypeDB) < semesterOrder.indexOf(semesterTypeIncoming)){
+                    // more recent semester
+                    const update = {
+                        $set: {lastOffered: semesterIncoming}
+                    }
+                    const updateResult = await courses.updateOne(courseFilter, update);
+                    console.log(`Updated most recently offered course for ${course.code} - ${course.name} - ${course.department} - ${semesterIncoming}`);
+                }
+           }
+           
         }
     }
 

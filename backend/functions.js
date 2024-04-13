@@ -84,7 +84,8 @@ async function searchCourses(department, searchTerm){
             const results = await courses.find({
                 $or: [
                     { name: {$regex: regex}},
-                    { code: {$regex: regex}}
+                    { code: {$regex: regex}},
+                    { "instructors.fullName": { $regex: regex } }
                 ]
             }).toArray();
 
@@ -92,8 +93,9 @@ async function searchCourses(department, searchTerm){
         } else{
             const results = await courses.find({
                 $or: [
-                    { name: {$regex: regex}},
-                    { code: {$regex: regex}}
+                    { name: { $regex: regex } },
+                    { code: { $regex: regex } },
+                    { "instructors.fullName": { $regex: regex } }
                 ],
                 department: department
             }).toArray();
