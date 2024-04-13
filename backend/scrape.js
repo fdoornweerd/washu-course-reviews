@@ -161,7 +161,7 @@ async function getClasses(){
                                     await driver.switchTo().window(windowHandles[0]); 
                                     
                                     // add instructor
-                                    instructorNames.push({"lastName":instructorLastName,"fullName":fullName});
+                                    instructorNames.push({"lastName":instructorLastName,"fullName":fullName, "semestersTaught":[semester]});
                                 }
                             }
                         }
@@ -190,7 +190,7 @@ async function getClasses(){
         }
     }
 
-    return jsonData;
+    return [semester, jsonData];
 }
 
 
@@ -201,7 +201,7 @@ const client = new MongoClient(uri);
 
 async function run() {
   try {
-    const coursesData = await getClasses();
+    const [semester,coursesData] = await getClasses();
     
     // insert courses into db
     const database = client.db('RateMyCourse');
@@ -217,13 +217,48 @@ async function run() {
             const result = await courses.insertOne(course);
             console.log(`Inserted course: ${course.code} - ${course.name} - ${course.department}`);
         } else{
+
+            let addedSemester = false;
+
             // check for instructors associated with the course who may have started teaching it
            const instructorInDB = existingCourse.instructors;
-           const newInstructors = course.instructors.filter(el => !instructorInDB.some(dbEl => dbEl.lastName === el.lastName && dbEl.fullName === el.fullName));
-           const updatedInstructors = newInstructors.concat(instructorInDB);
+           const newInstructors = course.instructors.filter(el => {
+            // if instructor isnt in database return true
+            // no need to add a semester taught because it isnt present
+            if (!instructorInDB.some(dbEl => dbEl.lastName === el.lastName && dbEl.fullName === el.fullName)) {
+                return true;
+            } else {
+                // instructor is already in DB
+                const matchingInstructor = instructorInDB.find(dbEl => dbEl.fullName === el.fullName);
+                // check if instructor has already been added to have been teaching course
+                if(!matchingInstructor.semestersTaught.includes(semester)){
+                    // if not add new semester
+                    matchingInstructor.semestersTaught.push(semester);
+                    const idx = instructorInDB.findIndex(dbEl => dbEl.fullName === el.fullName);
 
-           if(newInstructors.length > 0){
-            // insert new instructors
+                    // add back to database
+                    instructorInDB[idx] = matchingInstructor;
+                    addedSemester = true;
+
+                }
+            
+                return false; 
+            }
+        });
+
+
+        
+           let updatedInstructors = newInstructors.concat(instructorInDB);
+
+
+            let updatedInDB = "";
+            newInstructors.forEach(instructor => {
+                updatedInDB+=(instructor.lastName+" ");
+            });
+            if(addedSemester){
+                updatedInDB+=semester;
+            }
+            if(updatedInDB!=""){
                 const update = {
                     $set: { 
                         instructors: updatedInstructors,
@@ -231,12 +266,12 @@ async function run() {
                 };
                 const updateResult = await courses.updateOne(courseFilter, update);
 
-                let logOutput = "";
-                newInstructors.forEach(instructor => {
-                    logOutput+=(instructor.lastName+" ");
-                });
-                console.log(`Updated course instructors for: ${course.code} - ${course.name} - ${course.department} - ${logOutput}`);
-           }
+                // log update
+                console.log(`Updated course for: ${course.code} - ${course.name} - ${course.department} - ${updatedInDB}`);
+            }
+            
+
+
 
            //check if course was offered more recently
            const semesterDB = existingCourse.lastOffered;
