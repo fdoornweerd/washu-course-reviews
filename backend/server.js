@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors'); // what does this do?
 const {
     getSchools,
     getDepartments,
