@@ -1,4 +1,18 @@
 const express = require('express');
+const {
+    getSchools,
+    getDepartments,
+    getCourses,
+    searchCourses,
+    getProfessorLink,
+    insertReview,
+    fetchReviews,
+    summarizeReviews
+} = require('./functions');
+
+
+
+
 
 const app = express();
 const port = 3456;
@@ -6,7 +20,8 @@ const port = 3456;
 
 
 app.get('/', async (req, res) => {
-    res.send("Hello World!")
+    const schools = await getSchools();
+    res.json(schools);
 });
 
 app.listen(port, () => {
