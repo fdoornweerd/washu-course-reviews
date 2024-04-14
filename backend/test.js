@@ -1,4 +1,4 @@
-const { getSchools, getDepartments, getCourses, searchCourses,insertReview, fetchReviews } = require('./functions');
+const { getSchools, getDepartments, getCourses, searchCourses,insertReview, fetchReviews,summarizeReviews } = require('./functions');
 
 async function test() {
     try {
@@ -7,7 +7,8 @@ async function test() {
         //console.log(searchResult);
 
         //console.log(await insertReview(5,1,"mom", "B", "efw","1","1","A46 ARCH 111C"));
-        console.log(await fetchReviews("A46 ARCH 111C", "mom"))
+        //console.log(await fetchReviews("A46 ARCH 111C", "mom"))
+        console.log(await summarizeReviews());
     } catch (error) {
         console.error('Error:', error);
     }

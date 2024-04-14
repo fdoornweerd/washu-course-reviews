@@ -45,7 +45,7 @@ async function getClasses(){
 
     const jsonData = [];
 
-    for(let i=0; i<1; i++){
+    for(let i=0; i<2; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -68,7 +68,7 @@ async function getClasses(){
         const numDeptLinks = deptLinks.length;
 
 
-        for(let j=0; j<2; j++){
+        for(let j=0; j<numDeptLinks; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
             deptLinks = await deptContainer.findElements(By.css('a'));
@@ -95,7 +95,7 @@ async function getClasses(){
                 let classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
                 const numClassLinks = classLinks.length;
 
-                const num = numClassLinks > 3 ? 3 : numClassLinks
+                const num = numClassLinks > 5 ? 5 : numClassLinks
                 
                 for(let k=0; k<num; k++){
                     // update so links dont become stale
@@ -111,6 +111,14 @@ async function getClasses(){
                     const codeName = await classCodeLink.getText();
                     const className = await classNameLink.getText();
 
+                    // get details for course
+                    const expandDetailsBtn = await currLinkC.findElement(By.css('table > tbody > tr > td:nth-child(2) > div > table > tbody > tr > td:nth-child(1) > a'));
+                    //expand
+                    await expandDetailsBtn.click();
+                    const courseDetailsLink = await currLinkC.findElement(By.css('div.DivDetail > table > tbody > tr > td:nth-child(2) > table:nth-child(1) > tbody > tr > td:nth-child(2) > a'));
+                    const courseDetails = await courseDetailsLink.getText();
+                    //close
+                    await expandDetailsBtn.click();
                     // get sections of class (could be 1 or more)
                     const sections = await currLinkC.findElements(By.css('div.ResultTable > table > tbody > tr > td:nth-child(2) > div'));
                     
@@ -177,6 +185,7 @@ async function getClasses(){
                             "department": deptName,
                             "school": schoolName,
                             "instructors": instructorNames,
+                            "courseDetails":courseDetails,
                             "lastOffered": semester,
                             "numScores": 0,
                             "meanScore": -1,
@@ -246,8 +255,6 @@ async function run() {
             }
         });
 
-
-        
            let updatedInstructors = newInstructors.concat(instructorInDB);
 
 
@@ -299,6 +306,18 @@ async function run() {
                     const updateResult = await courses.updateOne(courseFilter, update);
                     console.log(`Updated most recently offered course for ${course.code} - ${course.name} - ${course.department} - ${semesterIncoming}`);
                 }
+           }
+
+
+
+           // check for updated course description
+
+           if(course.courseDetails != existingCourse.courseDetails){
+                const update = {
+                    $set: {courseDetails: course.courseDetails}
+                }
+                const updateResult = await courses.updateOne(courseFilter, update);
+                console.log(`Updated course description for ${course.code} - ${course.name} - ${course.department}`);
            }
            
         }

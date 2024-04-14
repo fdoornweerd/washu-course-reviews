@@ -1,4 +1,5 @@
 const { MongoClient } = require("mongodb");
+const OpenAI = require("openai");
 require('dotenv').config();
 
 
@@ -174,6 +175,22 @@ async function fetchReviews(courseCode, instructor){
 }
 
 
+// TODO: fix
+const openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
+async function summarizeReviews() {
+    response = openai.chat.completions.create(
+        model="gpt-3.5-turbo",
+        response_format={ "type": "json_object" },
+        messages=[
+          {role: "system", content: "You are a helpful assistant designed to output JSON."},
+          {role: "user", content: "Who won the world series in 2020?"}
+        ]
+      )
+
+  return response.choices[0].message.content
+}
+
+
 
 
 module.exports = {
@@ -183,7 +200,8 @@ module.exports = {
     searchCourses,
     getProfessorLink,
     insertReview,
-    fetchReviews
+    fetchReviews,
+    summarizeReviews
 };
 
 
