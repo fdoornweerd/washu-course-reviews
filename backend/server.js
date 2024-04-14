@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors'); // what does this do?
+var cors = require('cors')
 const {
     getSchools,
     getDepartments,
@@ -16,6 +16,7 @@ const {
 
 
 const app = express();
+app.use(cors())
 const port = 3456;
 
 
