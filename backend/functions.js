@@ -163,7 +163,14 @@ async function fetchReviews(courseCode, instructor){
     const result = await courses.findOne(
         {code: courseCode}
     )
-    let reviews = result.reviews || [];
+
+    let reviews;
+    if(result == null){
+        reviews = [];
+    } else{
+        reviews = result.reviews || [];
+    }
+
     if(instructor == 'all'){
         await client.close();
         return reviews;
@@ -175,19 +182,48 @@ async function fetchReviews(courseCode, instructor){
 }
 
 
-// TODO: fix
-const openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
-async function summarizeReviews() {
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        response_format={ "type": "json_object" },
-        messages=[
-          {role: "system", content: "You are a helpful assistant designed to output JSON."},
-          {role: "user", content: "Who won the world series in 2020?"}
-        ]
-      )
 
-  return response.choices[0].message.content
+
+async function summarizeReviews(courseCode) {
+    const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+    const client = new MongoClient(uri);
+    const database = client.db('RateMyCourse');
+    const courses = database.collection('courses');
+
+    const result = await courses.findOne(
+        {code: courseCode}
+    )
+    await client.close();
+
+
+    let reviews;
+    if(result == null){
+        reviews = [];
+    } else{
+        reviews = result.reviews || [];
+    }
+
+    let reviewString = "";
+    for(let i=0; i<reviews.length; i++){
+        reviewString+= `review ${i+1}: ${reviews[i].comment}`
+    }
+
+   
+
+    const openai = new OpenAI({
+        apiKey: process.env.OPEN_AI_KEY,
+    });
+
+    const chatCompletion = await openai.chat.completions.create({
+        messages: [
+            {role: "system", content: "You are an assistant that takes in a list of reviews, and then outputs a sumarized version of the reviews in no more than 3 sentences. If the string is empty output 'there are no reviews yet'"},
+            { role: "user", content: reviewString}
+        ],
+        model: "gpt-3.5-turbo",
+    });
+
+  return chatCompletion.choices[0].message.content;
 }
 
 
