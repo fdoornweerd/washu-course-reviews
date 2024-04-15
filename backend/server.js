@@ -1,5 +1,5 @@
 const express = require('express');
-var cors = require('cors')
+var cors = require('cors');
 const {
     getSchools,
     getDepartments,
@@ -25,6 +25,14 @@ app.get('/', async (req, res) => {
     const schools = await getSchools();
     res.json(schools);
 });
+
+
+app.post('/getAllCourses', async (req, res) => {
+    const schools = await getSchools();
+    const dept = req.body.dept;
+    res.json(schools);
+});
+
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

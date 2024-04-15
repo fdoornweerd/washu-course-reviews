@@ -115,6 +115,7 @@ async function getClasses(){
                     const expandDetailsBtn = await currLinkC.findElement(By.css('table > tbody > tr > td:nth-child(2) > div > table > tbody > tr > td:nth-child(1) > a'));
                     //expand
                     await expandDetailsBtn.click();
+                    await driver.sleep(250);
                     const courseDetailsLink = await currLinkC.findElement(By.css('div.DivDetail > table > tbody > tr > td:nth-child(2) > table:nth-child(1) > tbody > tr > td:nth-child(2) > a'));
                     const courseDetails = await courseDetailsLink.getText();
                     //close
