@@ -18,9 +18,8 @@ fetch("http://localhost:3456/getAllCourses", {
       body: JSON.stringify({dept: dept}),
     });
 
-    .then((res) => res.json())
-    .then((data) => setSchools(data));
-}
+   // .then((res) => res.json())
+    //.then((data) => setSchools(data));
 
 console.log("RERENDERED WOOO")
     return (
