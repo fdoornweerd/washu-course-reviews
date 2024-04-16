@@ -10,7 +10,7 @@ async function getClasses(){
     await driver.get('https://courses.wustl.edu/Semester/Listing.aspx');
 
     // schools to scrape
-    const schoolsAllowed = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
+    const SCHOOLS_ALLOWED = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
 
 
     //select semester to update (0 is most recent option)
@@ -54,7 +54,7 @@ async function getClasses(){
         const currLinkS = schoolLinks[i];
         const schoolName = await currLinkS.getText();
 
-        if(!schoolsAllowed.includes(schoolName)){
+        if(!SCHOOLS_ALLOWED.includes(schoolName)){
             continue;
         }
 
