@@ -45,7 +45,7 @@ async function getClasses(){
 
     const jsonData = [];
 
-    for(let i=0; i<2; i++){
+    for(let i=0; i<1; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -95,7 +95,7 @@ async function getClasses(){
                 let classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
                 const numClassLinks = classLinks.length;
 
-                const num = numClassLinks > 5 ? 5 : numClassLinks
+                const num = numClassLinks > 1 ? 1 : numClassLinks
                 
                 for(let k=0; k<numClassLinks; k++){
                     // update so links dont become stale

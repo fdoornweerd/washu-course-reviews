@@ -45,7 +45,7 @@ async function getDepartments(school){
 
 // returns all courses in a department
 // make the department 'all' to get all courses
-async function getCourses(department){
+async function getCourses(school, department){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -56,12 +56,30 @@ async function getCourses(department){
         if(department == 'all'){
             return await courses.find().toArray();
         } else{
-            return await courses.find({department: department}).toArray();
+            return await courses.find({department: department, school: school}).toArray();
         }
         
     
     } catch (err){
         console.error('Error fetching courses:', err);
+        return [];
+    } finally {
+        await client.close();
+    }
+}
+
+async function getCourse(school, department, code){
+    const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+    const client = new MongoClient(uri);
+    const database = client.db('RateMyCourse');
+    const courses = database.collection('courses');
+
+    try{
+        return await courses.findOne({department: department, school: school, code: code});
+    
+    } catch (err){
+        console.error('Error fetching course:', err);
         return [];
     } finally {
         await client.close();
@@ -234,6 +252,7 @@ module.exports = {
     getSchools,
     getDepartments,
     getCourses,
+    getCourse,
     searchCourses,
     getProfessorLink,
     insertReview,

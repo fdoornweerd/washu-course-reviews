@@ -5,6 +5,7 @@ const {
     getSchools,
     getDepartments,
     getCourses,
+    getCourse,
     searchCourses,
     getProfessorLink,
     insertReview,
@@ -27,14 +28,7 @@ const port = 3456;
 
 
 app.get('/', async (req, res) => {
-    let departments = new Map();
-    const SCHOOLS_ALLOWED = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
-    for(const school in SCHOOLS_ALLOWED){
-        const department = await getDepartments(school);
-        departments.set(school,departments);
-    }
-    
-    res.json({departments: departments});
+
 });
 
 
@@ -48,6 +42,33 @@ app.post('/getDepartments', async (req, res) => {
         res.status(500).json({ error: "Failed to fetch departments" });
     }
 });
+
+app.post('/getCourses', async (req, res) => {
+    try {
+        const school = req.body.school;
+        const department = req.body.department;
+        const courses = await getCourses(school,department);
+        res.json(courses);
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        res.status(500).json({ error: "Failed to fetch courses" });
+    }
+});
+
+app.post('/getCourse', async (req, res) => {
+    try {
+        const school = req.body.school;
+        const department = req.body.department;
+        const code = req.body.code;
+        const courses = await getCourse(school,department, code);
+        res.json(courses);
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        res.status(500).json({ error: "Failed to fetch courses" });
+    }
+});
+
+
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

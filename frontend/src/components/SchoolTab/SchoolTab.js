@@ -20,7 +20,7 @@ const chooseSchool = () => {
     >{schoolName}</button>
     </div>
     <div className = "dept-view">
-      {schoolName === activeSchool &&   <Departments school = {schoolName}/>}
+      {schoolName === activeSchool &&   <Departments key={schoolName} school = {schoolName}/>}
     </div>
     </div>
   )
