@@ -97,7 +97,7 @@ async function getClasses(){
 
                 const num = numClassLinks > 5 ? 5 : numClassLinks
                 
-                for(let k=0; k<num; k++){
+                for(let k=0; k<numClassLinks; k++){
                     // update so links dont become stale
                     classContainer = await driver.findElement(By.xpath(classXPath));
                     classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
@@ -112,14 +112,17 @@ async function getClasses(){
                     const className = await classNameLink.getText();
 
                     // get details for course
+                    
                     const expandDetailsBtn = await currLinkC.findElement(By.css('table > tbody > tr > td:nth-child(2) > div > table > tbody > tr > td:nth-child(1) > a'));
+
+                    //hover over button and then click
+                    await driver.actions({ bridge: true }).move({ duration: 250, origin: expandDetailsBtn }).perform();
                     //expand
                     await expandDetailsBtn.click();
-                    await driver.sleep(250);
+                    
                     const courseDetailsLink = await currLinkC.findElement(By.css('div.DivDetail > table > tbody > tr > td:nth-child(2) > table:nth-child(1) > tbody > tr > td:nth-child(2) > a'));
                     const courseDetails = await courseDetailsLink.getText();
-                    //close
-                    await expandDetailsBtn.click();
+
                     // get sections of class (could be 1 or more)
                     const sections = await currLinkC.findElements(By.css('div.ResultTable > table > tbody > tr > td:nth-child(2) > div'));
                     
