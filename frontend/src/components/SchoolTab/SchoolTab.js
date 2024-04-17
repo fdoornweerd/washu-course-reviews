@@ -1,20 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import Departments from "../Departments/Departments";
 
-export default function SchoolTab({ school, departments }) {
-  const [showDepartments, setShowDepartments] = useState(true);
 
-  const toggleDepartments = () => {
-    setShowDepartments(!showDepartments);
-  };
+
+export default function SchoolTab({ schoolName, activeSchool, setActiveSchool}) {
+
+
+
+const chooseSchool = () => {
+  setActiveSchool(schoolName)
+}
 
   return (
-    <div>
-      <p>SCHOOL: {school}</p>
-      <button onClick={toggleDepartments}>
-        {showDepartments ? `Hide ${school} Departments` : `View ${school} Departments`}
-      </button>
-      {showDepartments && <Departments departments={departments} />}
+    //check if school is active dept
+    <div className = "main-body">
+    <div className = "tabs">
+    <button className = "school-btn"
+    onClick={chooseSchool}
+    >{schoolName}</button>
     </div>
-  );
+    <div className = "dept-view">
+      {schoolName === activeSchool &&   <Departments school = {schoolName}/>}
+    </div>
+    </div>
+  )
 }

@@ -1,22 +1,25 @@
 import React, { useState } from "react";
 
 export default function CoursesSelector({dept}){
-
-
     const [deptCourses, setDeptCourses] = useState([])
+    fetchCourses();
 
-    fetch("http://localhost:3456/getAllCourses", {
-
-        method: "POST", // or 'PUT'
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({dept: dept}),
-      });
-      .then((res) => res.json())
-      .then((data) => setSchools(data));
-  }
-  
+    async function fetchCourses(){
+        try {
+          const response = await fetch("http://localhost:3456/getAllCourses", {
+            method: "POST", // or 'PUT'
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({dept: dept}),
+          });
+          const data = await response.json();
+          setDeptCourses(data);
+        } catch (error) {
+          console.error("Error fetching departments:", error);
+        }
+      };
+    
     return (
         <>
         <h2>COURSES for {dept}:</h2>

@@ -1,18 +1,20 @@
 import './App.css';
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Tabs from './components/Tabs/Tabs';
 import CoursesSelector from './components/CoursesSelector/CoursesSelector';
 
 function App() {
-  const [activeDept, setActiveDept] = useState("")
+  const startingSchool = "Architecture";
   const schools = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
 
   return (
     
     <div className="App">
-      <Tabs schools={schools} setActiveDept={setActiveDept}/>
+      <div className = "tabs">
+       <Tabs schools={schools}/> 
+      </div>
 
-      <CoursesSelector dept={activeDept}/>
+      <CoursesSelector dept={startingSchool}/>
     </div>
   );
 }
