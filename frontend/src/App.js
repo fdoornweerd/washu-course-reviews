@@ -4,20 +4,15 @@ import Tabs from './components/Tabs/Tabs';
 import CoursesSelector from './components/CoursesSelector/CoursesSelector';
 
 function App() {
-  const [departments, setDepartments] = useState(null);
-
- useEffect(() => {
-    fetch("http://localhost:3456")
-      .then((res) => res.json())
-      .then((data) => setDepartments(data.departments));
-  }, []);
+  const [activeDept, setActiveDept] = useState("")
+  const schools = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
 
   return (
     
     <div className="App">
-      <Tabs departments={departments}/>
+      <Tabs schools={schools} setActiveDept={setActiveDept}/>
 
-      <CoursesSelector/>
+      <CoursesSelector dept={activeDept}/>
     </div>
   );
 }
