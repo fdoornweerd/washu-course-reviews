@@ -3,12 +3,11 @@ import React from "react";
 import Tabs from './components/Tabs/Tabs';
 import CoursesSelector from './components/CoursesSelector/CoursesSelector';
 import Course from './components/Course/Course';
+import WriteReview from './components/Review/WriteReview';
 import ViewAll from './components/ViewAll/ViewAll';
-import { useNavigate } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 function App() {
-  const startingSchool = "Architecture";
   const schools = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
 
   return (
@@ -37,6 +36,9 @@ function App() {
             <Course/>
           } />    
 
+          <Route path="/:school/:department/:code/review" element={
+            <WriteReview/>
+          } />    
 
           <Route path="/:all" element={
             <CoursesSelector/>

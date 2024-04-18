@@ -46,8 +46,8 @@ export default function Departments({ school}) {
   return (
     <div>
       <ul>
-        {departments.map((dept) => (
-          <li>
+        {departments.map((dept, index) => (
+          <li key = {index}>
             <button key={dept} onClick={ () => deptClick(school,dept)}>{dept}</button>
           </li>
         ))}

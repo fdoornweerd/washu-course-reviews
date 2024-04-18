@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
+import ReactLoading from "react-loading";
 
 export default function CoursesSelector(){
     const [courses, setCourses] = useState([])
@@ -9,11 +10,6 @@ export default function CoursesSelector(){
     const { school, department } = useParams();
     const navigate = useNavigate();
 
-    useEffect(() => {
-      fetchCourses();
-    }, [school, department]);
-
-
     const filteredCourses = courses.filter(course =>
       course.code.toLowerCase().includes(inputValue.toLowerCase()) ||
       course.name.toLowerCase().includes(inputValue.toLowerCase()) ||
@@ -21,7 +17,8 @@ export default function CoursesSelector(){
   );
 
 
-    async function fetchCourses(){
+    //async function fetchCourses(){
+      const fetchCourses = useCallback(async () => {
         try {
           setIsLoading(true);
           const response = await fetch("http://localhost:3456/getCourses", {
@@ -29,7 +26,7 @@ export default function CoursesSelector(){
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({school: school == null ? 'all' :school, department: department == null ? 'all' : department}),
+            body: JSON.stringify({school: school === null ? 'all' :school, department: department === null ? 'all' : department}),
           });
           const data = await response.json();
           setCourses(data);
@@ -40,10 +37,16 @@ export default function CoursesSelector(){
         }
 
 
-      };
+      }, [school, department]);
+
+    useEffect(() => {
+      fetchCourses();
+    }, [fetchCourses, school, department]);
+
 
       if(isLoading){
-        return <div>Loading...</div>
+         return <ReactLoading type="spokes" color="#0000FF"
+      height={100} width={50} />;
       }
 
       const courseClick = (schoolNav,deptNav,codeNav) => {
@@ -65,7 +68,7 @@ export default function CoursesSelector(){
           onChange={inputChange}
       />
         {filteredCourses.map((course) => (
-            <li>
+            <li key = {course.id}>
               <button key={course.id} onClick={ () => courseClick(course.school,course.department,course.code)}>{course.code} - {course.name}</button>
             </li>
         ))}
