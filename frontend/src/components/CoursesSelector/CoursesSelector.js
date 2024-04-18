@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function CoursesSelector(){
     const [courses, setCourses] = useState([])
+    const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(true)
     const { school, department } = useParams();
     const navigate = useNavigate();
@@ -11,6 +12,14 @@ export default function CoursesSelector(){
     useEffect(() => {
       fetchCourses();
     }, [school, department]);
+
+
+    const filteredCourses = courses.filter(course =>
+      course.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+      course.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+      (course.instructors && course.instructors.some(instructor => instructor.fullName.toLowerCase().includes(inputValue.toLowerCase())))
+  );
+
 
     async function fetchCourses(){
         try {
@@ -20,7 +29,7 @@ export default function CoursesSelector(){
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({school: school, department: department}),
+            body: JSON.stringify({school: school == null ? 'all' :school, department: department == null ? 'all' : department}),
           });
           const data = await response.json();
           setCourses(data);
@@ -29,6 +38,8 @@ export default function CoursesSelector(){
         } finally {
           setIsLoading(false);
         }
+
+
       };
 
       if(isLoading){
@@ -38,12 +49,22 @@ export default function CoursesSelector(){
       const courseClick = (schoolNav,deptNav,codeNav) => {
         navigate(`/${schoolNav}/${deptNav}/${codeNav}`);
       };
+
+      const inputChange = (event) => {
+        setInputValue(event.target.value);
+      };
     
     return (
         <>
         <h2>COURSES for {department}:</h2>
-
-        {courses.map((course) => (
+        <p>Search for course</p>
+        <input
+          type='text'
+          placeholder="code, name, or professor"
+          value={inputValue}
+          onChange={inputChange}
+      />
+        {filteredCourses.map((course) => (
             <li>
               <button key={course.id} onClick={ () => courseClick(course.school,course.department,course.code)}>{course.code} - {course.name}</button>
             </li>
