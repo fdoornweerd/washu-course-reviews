@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import ReactLoading from "react-loading";
 
 export default function Departments({ school}) {
   const navigate = useNavigate();
@@ -38,7 +39,8 @@ export default function Departments({ school}) {
     };
   
     if (isLoading) {
-      return <div>Loading...</div>;
+      return  <ReactLoading type="spokes" color="#0000FF"
+      height={100} width={50} />;
     }
 
   return (
