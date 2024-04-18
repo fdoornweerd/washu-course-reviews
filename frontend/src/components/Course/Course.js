@@ -39,11 +39,15 @@ export default function Course(){
       setIsDetailsShown(!isDetailsShown);
     }
 
-    const openRateMyProfessor = () => {
-      const nameParts = selectedProfessor[1].split(' ');
-      const firstName = nameParts[0];
-      const lastName = nameParts[1];
-      window.open(`https://www.ratemyprofessors.com/search/professors/1147?q=${firstName}%20${lastName}`, '_blank', 'noopener,noreferrer');
+    const openRateMyProfessor = (fullName) => {
+      let nameSearch;
+      if(typeof fullName !== 'string'){
+        nameSearch = selectedProfessor[1].replace(' ','%20')
+      } else{
+        nameSearch = fullName.replace(' ','%20');
+      }
+
+      window.open(`https://www.ratemyprofessors.com/search/professors/1147?q=${nameSearch}`, '_blank', 'noopener,noreferrer');
     }
     
     const selectNewProfessor = (event) => {
@@ -119,6 +123,44 @@ export default function Course(){
           }
         </div>
        
+
+
+
+
+
+        <div>
+          <p>Reviews For {selectedProfessor[0] == '' ? 'All Professors' : selectedProfessor[0]}</p>
+          {course.reviews.map((review) => (
+            (selectedProfessor[0] == '' || review.instructor.includes(selectedProfessor[1])) && (
+            <div>
+              <p>Quality: {review.quality}</p>
+              <p>Difficulty: {review.difficulty}</p>
+
+              <p>{review.instructor.length == 1 ? 'Professor' : 'Professors'}: {review.instructor.map((instructor) => (
+                  <li style={{ cursor: 'pointer' }} onClick={() => openRateMyProfessor(instructor)}>{instructor}</li>
+              ))}</p>
+
+              <div>
+                <p>{review.comment}</p>
+              </div>
+
+              <div>
+                {review.date}
+              </div>
+              
+
+
+
+
+            </div>
+            )
+          ))}
+
+        </div>
+
+
+
+
         </>
     )
 }
