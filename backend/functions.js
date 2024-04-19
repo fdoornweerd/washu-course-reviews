@@ -142,7 +142,7 @@ function getProfessorLink(fullName){
 
 // TODO: figure out how to grab dateposted and how to track userID so they cant comment a lot (once per session or something?)
 // quality (num 1-5) difficulty (num 1-5 ) instructor (array of last names) grade (letter grade)
-async function insertReview(quality, difficulty, instructor, grade, comment, datePosted, userIDThing, courseCode){
+async function insertReview(quality, difficulty, instructor, hours, comment, datePosted, userIDThing, courseCode){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -153,7 +153,7 @@ async function insertReview(quality, difficulty, instructor, grade, comment, dat
         "quality": quality,
         "difficulty": difficulty,
         "instructor": instructor,
-        "grade": grade,
+        "hours": hours,
         "comment": comment,
         "date": datePosted,
         "idThing": userIDThing, //TODO: change

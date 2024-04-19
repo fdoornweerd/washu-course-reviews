@@ -26,7 +26,7 @@ export default function CoursesSelector(){
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({school: school === null ? 'all' :school, department: department === null ? 'all' : department}),
+            body: JSON.stringify({school: school === undefined ? 'all' :school, department: department === undefined ? 'all' : department}),
           });
           const data = await response.json();
           setCourses(data);

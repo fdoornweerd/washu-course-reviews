@@ -101,7 +101,6 @@ export default function Course(){
                 {instructor.lastName}
               </option>
             ))}
-
           </select>
         </div>
         <div>

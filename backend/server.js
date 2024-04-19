@@ -68,6 +68,25 @@ app.post('/getCourse', async (req, res) => {
     }
 });
 
+app.post('/insertReview', async (req, res) => {
+    try {
+        const courseCode = req.body.code
+        const professor = req.body.professor;
+        const quality = req.body.quality;
+        const difficulty = req.body.difficulty;
+        const hours = req.body.hours;
+        const comment = req.body.comment;
+        const date = req.body.date;
+        const userID = req.body.userID; // change
+
+        await insertReview(quality, difficulty, professor, hours, comment, date, userID, courseCode)
+        res.json(true);
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        res.status(500).json({ error: "Failed to fetch courses" });
+    }
+});
+
 
 
 app.listen(port, () => {
