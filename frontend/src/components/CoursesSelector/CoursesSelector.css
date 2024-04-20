@@ -1,0 +1,32 @@
+.loadingScreen{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 25%;
+}
+
+.course-body{
+    margin-left: 4em;
+    margin-right: 4em;
+}
+#search{
+    margin-right: 1em;
+}
+li{
+    list-style-type: none;
+}
+.course-btn{
+    background-color: transparent;
+    border: none;
+    color: #2E6939;
+}
+.course-btn:hover{
+    color: #1B4726;
+    text-decoration: underline;
+}
+.search-bar{
+    justify-content: center;
+    margin: 2em;
+    display: flex;
+}

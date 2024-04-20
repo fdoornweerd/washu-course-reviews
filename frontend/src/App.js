@@ -14,14 +14,10 @@ function App() {
     <Router>
       <div>
         <Routes>
-
-
-
           <Route path="/" element={
               <div className="App">
                 <div className="tabs">
                   <Tabs schools={schools}/> 
-                  <ViewAll to="/all"></ViewAll>
                 </div>
                 
               </div>
@@ -43,9 +39,6 @@ function App() {
           <Route path="/:all" element={
             <CoursesSelector/>
           } />
-
-
-
 
         </Routes>
       </div>

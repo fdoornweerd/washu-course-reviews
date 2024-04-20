@@ -1,6 +1,7 @@
 import React, { useState, useEffect,useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactLoading from "react-loading";
+import "./Course.css";
 
 export default function Course(){
     const [course, setCourse] = useState([])
@@ -74,18 +75,22 @@ export default function Course(){
 
     }
 
-    if(isLoading){
-      return <ReactLoading type="spokes" color="#0000FF"
-      height={100} width={50} />;
+    if (isLoading) {
+      return(
+        <div className ="loadingScreen">
+        <ReactLoading type="spokes" color="#D33C41"
+      height={100} width={50} />
+      </div>
+      )  
     }
     return (
-        <>
+        <div className="course-body">
         <h2>{course.name} - {course.code}</h2>
-        <div>
-          Most Recently Offered: {course.lastOffered}
+        <div className="review-btn-container">
+          <button className="course-action-btn" onClick={() => writeReview(school, department, code)}>Write a Review</button>
         </div>
         <div>
-          <button onClick={() => writeReview(school, department, code)}>Write a Review</button>
+          Most Recently Offered: {course.lastOffered}
         </div>
         <div>
           {!isDetailsShown && <button onClick={()=> toggleDescription()}>Open Description</button>}
@@ -142,6 +147,6 @@ export default function Course(){
 
 
 
-        </>
+        </div>
     )
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect,useCallback } from "react";
 import { useParams } from "react-router-dom";
 import ReactLoading from "react-loading";
 import { useNavigate } from "react-router-dom";
-
+import "./Review.css";
 
 export default function WriteReview() {
 
@@ -115,9 +115,13 @@ export default function WriteReview() {
     navigate(`/${school}/${department}/${code}`);
   };
 
-  if(isLoading){
-    return <ReactLoading type="spokes" color="#0000FF"
-    height={100} width={50} />;
+  if (isLoading) {
+    return(
+      <div className ="loadingScreen">
+      <ReactLoading type="spokes" color="#D33C41"
+    height={100} width={50} />
+    </div>
+    )  
   }
 
 

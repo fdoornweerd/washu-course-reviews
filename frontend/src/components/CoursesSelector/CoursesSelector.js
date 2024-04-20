@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import ReactLoading from "react-loading";
+import './CoursesSelector.css';
 
 export default function CoursesSelector(){
     const [courses, setCourses] = useState([])
@@ -44,10 +45,14 @@ export default function CoursesSelector(){
     }, [fetchCourses, school, department]);
 
 
-      if(isLoading){
-         return <ReactLoading type="spokes" color="#0000FF"
-      height={100} width={50} />;
-      }
+    if (isLoading) {
+      return(
+        <div className ="loadingScreen">
+        <ReactLoading type="spokes" color="#D33C41"
+      height={100} width={50} />
+      </div>
+      )  
+    }
 
       const courseClick = (schoolNav,deptNav,codeNav) => {
         navigate(`/${schoolNav}/${deptNav}/${codeNav}`);
@@ -58,20 +63,22 @@ export default function CoursesSelector(){
       };
     
     return (
-        <>
+        <div className = "course-body">
         <h2>COURSES for {department}:</h2>
-        <p>Search for course</p>
+        <div className = "search-bar">
+        <p id = "search">Search for course</p>
         <input
           type='text'
           placeholder="code, name, or professor"
           value={inputValue}
           onChange={inputChange}
       />
+      </div>
         {filteredCourses.map((course) => (
             <li key = {course.id}>
-              <button key={course.id} onClick={ () => courseClick(course.school,course.department,course.code)}>{course.code} - {course.name}</button>
+              <button className ="course-btn" key={course.id} onClick={ () => courseClick(course.school,course.department,course.code)}>{course.code} - {course.name}</button>
             </li>
         ))}
-        </>
+        </div>
     )
 }

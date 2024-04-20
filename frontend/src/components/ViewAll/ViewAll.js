@@ -1,6 +1,7 @@
 // NavigateButton.js
 import React from "react";
 import { useNavigate } from 'react-router-dom';
+import "./ViewAll.css";
 
 function ViewAll({ to }) {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ function ViewAll({ to }) {
     navigate(to);
   };
 
-  return <button onClick={handleClick}>View All</button>;
+  return <button id = "viewAllTab" onClick={handleClick}>View All</button>;
 }
 
 export default ViewAll;

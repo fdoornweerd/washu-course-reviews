@@ -1,0 +1,14 @@
+#viewAllTab{
+    width:100%;
+    height: 3em;
+    font-weight: bold;
+    background-color: #1B4726;
+    color: #E5DED6;
+}
+
+#viewAllTab:hover{
+    background-color: #2E6939;
+}
+#viewAllTab:focus{
+    background-color: #2E6939;
+}
