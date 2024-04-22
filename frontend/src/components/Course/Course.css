@@ -9,6 +9,29 @@
     margin-left: 4em;
     margin-right: 4em;
 }
+.difficulty-quality{
+    display:flex;
+    width:100%;
+    justify-content: right;
+    color: #1B4726;
+}
+.professor-review{
+    display: block;
+}
+#quality{
+    margin-right: 1em;
+}
+#date{
+    width: 100%;
+    display:flex;
+    color:gray;
+    font-size: .8em;
+    justify-content: right;
+}
+.review{
+    border:.1em solid #2E6939;
+    padding:1em;
+}
 .review-btn-container{
     margin-top: 2em;
     margin-bottom: 2em;
@@ -17,8 +40,11 @@
     justify-content: center;
 }
 .course-action-btn{
-    background-color: #2E6939;
+    background-color: #1B4726;
     color:#E5DED6;
     width:12em;
     height: 3em;
+}
+.course-action-btn:hover{
+background-color: #2E6939;;
 }

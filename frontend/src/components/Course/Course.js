@@ -126,17 +126,20 @@ export default function Course(){
           {course.reviews.map((review) => (
             (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[1])) && (
             <div className = "review">
-              <p>Quality: {review.quality}</p>
+              <div className="difficulty-quality">
+              <p id = "quality">Quality: {review.quality}</p>
               <p>Difficulty: {review.difficulty}</p>
-
+              </div>
+              <div className="professor-review">
               <p>{review.instructor.length === 1 ? 'Professor' : 'Professors'}: {review.instructor.map((instructor,index) => (
                   <li key = {index} style={{ cursor: 'pointer' }} onClick={() => openRateMyProfessor(instructor)}>{instructor}</li>
               ))}</p>
               <div>
                 <p>{review.comment}</p>
               </div>
-              <div>
-                {review.date}
+              <div id = "date">
+                <p>{review.date}</p>
+              </div>
               </div>
             </div>
             )

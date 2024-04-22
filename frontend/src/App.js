@@ -16,6 +16,9 @@ function App() {
         <Routes>
           <Route path="/" element={
               <div className="App">
+                   <div className = "title">
+                  <h1>WashU Course Critic</h1>
+                </div>
                 <div className="tabs">
                   <Tabs schools={schools}/> 
                 </div>

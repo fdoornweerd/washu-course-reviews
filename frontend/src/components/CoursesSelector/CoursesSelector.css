@@ -7,9 +7,9 @@
 }
 
 .course-body{
-    margin-left: 4em;
-    margin-right: 4em;
+    margin:0em 4em 4em 4em;
 }
+
 #search{
     margin-right: 1em;
 }
@@ -20,6 +20,7 @@ li{
     background-color: transparent;
     border: none;
     color: #2E6939;
+    margin: 1em 0em 1em 4em;
 }
 .course-btn:hover{
     color: #1B4726;

@@ -63,7 +63,7 @@ export default function CoursesSelector(){
       };
     
     return (
-        <div className = "course-body">
+          <div className="course-list">
         <h2>COURSES for {department}:</h2>
         <div className = "search-bar">
         <p id = "search">Search for course</p>
