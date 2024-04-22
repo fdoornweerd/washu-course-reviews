@@ -68,7 +68,7 @@ async function getClasses(){
         const numDeptLinks = deptLinks.length;
 
 
-        for(let j=0; j<numDeptLinks; j++){
+        for(let j=0; j<2; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
             deptLinks = await deptContainer.findElements(By.css('a'));
@@ -95,9 +95,9 @@ async function getClasses(){
                 let classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
                 const numClassLinks = classLinks.length;
 
-                const num = numClassLinks > 1 ? 1 : numClassLinks
+                const num = numClassLinks > 3 ? 3 : numClassLinks
                 
-                for(let k=0; k<numClassLinks; k++){
+                for(let k=0; k<num; k++){
                     // update so links dont become stale
                     classContainer = await driver.findElement(By.xpath(classXPath));
                     classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
@@ -163,7 +163,7 @@ async function getClasses(){
                                 
 
                                     //get FULL instructor name 
-                                    const element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
+                                    const element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 60000);
                                     const fullName = await element.getText();
                         
                                     // close current window
@@ -176,15 +176,15 @@ async function getClasses(){
                                     instructorNames.push({"lastName":instructorLastName,"fullName":fullName, "semestersTaught":[semester]});
                                 }
                             }
-                        }
+                        } 
                     }
 
 
-                    console.log(`${codeName} ${className}`);
+                    console.log(`${deptName} ${className}`);
 
                     jsonData.push(
                         {
-                            "code": codeName,
+                            "code": [codeName],
                             "name": className,
                             "department": deptName,
                             "school": schoolName,
@@ -220,16 +220,39 @@ async function run() {
     const database = client.db('RateMyCourse');
     const courses = database.collection('courses');
 
+
     // go through each course
     for(const course of coursesData){
         // get course from database with unqiue course code
-        const courseFilter = { code: course.code }
+        const courseFilter = { name: course.name }
         const existingCourse = await courses.findOne(courseFilter);
+
+
+
+
         if(!existingCourse){
             // if it doesnt exist insert it
             const result = await courses.insertOne(course);
-            console.log(`Inserted course: ${course.code} - ${course.name} - ${course.department}`);
+            console.log(`Inserted course: ${course.department} - ${course.name}`);
         } else{
+
+            // check if course code is different and add it to list
+            if(!existingCourse.code.includes(course.code[0])){
+                let updatedCodes = [...existingCourse.code,course.code[0]];
+                const update = {
+                    $set: { 
+                        code: updatedCodes,
+                        }
+                };
+                const updateResult = await courses.updateOne(courseFilter, update);
+
+                // log update
+                console.log(`Updated course codes for: ${course.department} - ${course.name} - ${course.code}`);
+            }
+
+
+
+
 
             let addedSemester = false;
 
@@ -278,7 +301,7 @@ async function run() {
                 const updateResult = await courses.updateOne(courseFilter, update);
 
                 // log update
-                console.log(`Updated course for: ${course.code} - ${course.name} - ${course.department} - ${updatedInDB}`);
+                console.log(`Updated course for: ${course.department} - ${course.name} - ${updatedInDB}`);
             }
             
 
@@ -299,7 +322,7 @@ async function run() {
                     $set: {lastOffered: semesterIncoming}
                 }
                 const updateResult = await courses.updateOne(courseFilter, update);
-                console.log(`Updated most recently offered course for ${course.code} - ${course.name} - ${course.department} - ${semesterIncoming}`);
+                console.log(`Updated most recently offered course for ${course.department} - ${course.name} - ${semesterIncoming}`);
            } else if(yearIncoming == yearDB){
                 const semesterOrder = ["SP","SU","FL"];
                 if(semesterOrder.indexOf(semesterTypeDB) < semesterOrder.indexOf(semesterTypeIncoming)){
@@ -308,7 +331,7 @@ async function run() {
                         $set: {lastOffered: semesterIncoming}
                     }
                     const updateResult = await courses.updateOne(courseFilter, update);
-                    console.log(`Updated most recently offered course for ${course.code} - ${course.name} - ${course.department} - ${semesterIncoming}`);
+                    console.log(`Updated most recently offered course for ${course.department} - ${course.name} - ${semesterIncoming}`);
                 }
            }
 
@@ -321,7 +344,7 @@ async function run() {
                     $set: {courseDetails: course.courseDetails}
                 }
                 const updateResult = await courses.updateOne(courseFilter, update);
-                console.log(`Updated course description for ${course.code} - ${course.name} - ${course.department}`);
+                console.log(`Updated course description for ${course.department} - ${course.name}`);
            }
            
         }
@@ -330,6 +353,7 @@ async function run() {
 
   } finally {
     await client.close();
+
   }
 }
 

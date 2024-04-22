@@ -68,7 +68,7 @@ async function getCourses(school, department){
     }
 }
 
-async function getCourse(school, department, code){
+async function getCourse(school, department, name){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -76,7 +76,7 @@ async function getCourse(school, department, code){
     const courses = database.collection('courses');
 
     try{
-        return await courses.findOne({department: department, school: school, code: code});
+        return await courses.findOne({department: department, school: school, name: name});
     
     } catch (err){
         console.error('Error fetching course:', err);
@@ -142,7 +142,7 @@ function getProfessorLink(fullName){
 
 // TODO: figure out how to grab dateposted and how to track userID so they cant comment a lot (once per session or something?)
 // quality (num 1-5) difficulty (num 1-5 ) instructor (array of last names) grade (letter grade)
-async function insertReview(quality, difficulty, instructor, hours, comment, datePosted, userIDThing, courseCode){
+async function insertReview(quality, difficulty, instructor, hours, comment, datePosted, courseName){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -155,12 +155,11 @@ async function insertReview(quality, difficulty, instructor, hours, comment, dat
         "instructor": instructor,
         "hours": hours,
         "comment": comment,
-        "date": datePosted,
-        "idThing": userIDThing, //TODO: change
+        "date": datePosted
     }
 
     const result = await courses.updateOne(
-        { code: courseCode },
+        { name: courseName },
         { $push: 
             { reviews: JSON_review} 
         }
@@ -172,7 +171,7 @@ async function insertReview(quality, difficulty, instructor, hours, comment, dat
 }
 
 // set instructor to 'all' if getting all reviews
-async function fetchReviews(courseCode, instructor){
+async function fetchReviews(courseName, instructor){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -180,7 +179,7 @@ async function fetchReviews(courseCode, instructor){
     const courses = database.collection('courses');
 
     const result = await courses.findOne(
-        {code: courseCode}
+        {name: courseName}
     )
 
     let reviews;
@@ -203,7 +202,7 @@ async function fetchReviews(courseCode, instructor){
 
 
 
-async function summarizeReviews(courseCode) {
+async function summarizeReviews(courseName) {
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -211,7 +210,7 @@ async function summarizeReviews(courseCode) {
     const courses = database.collection('courses');
 
     const result = await courses.findOne(
-        {code: courseCode}
+        {name: courseName}
     )
     await client.close();
 

@@ -12,7 +12,7 @@ export default function CoursesSelector(){
     const navigate = useNavigate();
 
     const filteredCourses = courses.filter(course =>
-      course.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+      course.code.some(code => code.toLowerCase().includes(inputValue.toLowerCase())) ||
       course.name.toLowerCase().includes(inputValue.toLowerCase()) ||
       (course.instructors && course.instructors.some(instructor => instructor.fullName.toLowerCase().includes(inputValue.toLowerCase())))
   );
@@ -54,8 +54,8 @@ export default function CoursesSelector(){
       )  
     }
 
-      const courseClick = (schoolNav,deptNav,codeNav) => {
-        navigate(`/${schoolNav}/${deptNav}/${codeNav}`);
+      const courseClick = (schoolNav,deptNav,nameNav) => {
+        navigate(`/${schoolNav}/${deptNav}/${nameNav}`);
       };
 
       const inputChange = (event) => {
@@ -77,7 +77,7 @@ export default function CoursesSelector(){
       <div className="course-buttons">
         {filteredCourses.map((course) => (
             <li key = {course.id}>
-              <button className ="course-btn" key={course.id} onClick={ () => courseClick(course.school,course.department,course.code)}>{course.name}</button>
+              <button className ="course-btn" key={course.id} onClick={ () => courseClick(course.school,course.department,course.name)}>{course.name}</button>
             </li>
         ))}
         </div>

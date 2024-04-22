@@ -59,8 +59,8 @@ app.post('/getCourse', async (req, res) => {
     try {
         const school = req.body.school;
         const department = req.body.department;
-        const code = req.body.code;
-        const courses = await getCourse(school,department, code);
+        const name = req.body.name;
+        const courses = await getCourse(school,department, name);
         res.json(courses);
     } catch (error) {
         console.error("Error fetching courses:", error);
@@ -70,16 +70,15 @@ app.post('/getCourse', async (req, res) => {
 
 app.post('/insertReview', async (req, res) => {
     try {
-        const courseCode = req.body.code
+        const courseName = req.body.name
         const professor = req.body.professor;
         const quality = req.body.quality;
         const difficulty = req.body.difficulty;
         const hours = req.body.hours;
         const comment = req.body.comment;
         const date = req.body.date;
-        const userID = req.body.userID; // change
 
-        await insertReview(quality, difficulty, professor, hours, comment, date, userID, courseCode)
+        await insertReview(quality, difficulty, professor, hours, comment, date, courseName)
         res.json(true);
     } catch (error) {
         console.error("Error fetching courses:", error);

@@ -17,7 +17,7 @@ function App() {
           <Route path="/" element={
               <div className="App">
                    <div className = "title">
-                  <h1>WashU Course Critic</h1>
+                  <h1>WashU Course Reviews</h1>
                 </div>
                 <div className="tabs">
                   <Tabs schools={schools}/> 
@@ -31,11 +31,11 @@ function App() {
           } />
 
 
-          <Route path="/:school/:department/:code" element={
+          <Route path="/:school/:department/:name" element={
             <Course/>
           } />    
 
-          <Route path="/:school/:department/:code/review" element={
+          <Route path="/:school/:department/:name/review" element={
             <WriteReview/>
           } />    
 

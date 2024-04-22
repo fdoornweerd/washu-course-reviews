@@ -26,7 +26,7 @@ export default function WriteReview() {
   });
 
 
-  const { school, department, code } = useParams();
+  const { school, department, name } = useParams();
     
   const fetchCourse = useCallback(async () => {
       try {
@@ -36,7 +36,7 @@ export default function WriteReview() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({school: school, department: department, code: code}),
+          body: JSON.stringify({school: school, department: department, name: name}),
         });
         const data = await response.json();
         setCourse(data);
@@ -50,11 +50,11 @@ export default function WriteReview() {
       } finally {
           setIsLoading(false);
       }
-    }, [school, department,code]);
+    }, [school, department,name]);
 
     useEffect(() => {
         fetchCourse();
-    }, [fetchCourse, school, department,code]);
+    }, [fetchCourse, school, department,name]);
 
 
 
@@ -69,14 +69,13 @@ export default function WriteReview() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ 
-            code: code,
+            name: name,
             professor: instructorsInsert,
             quality: formData.quality,
             difficulty: formData.difficulty,
             hours: formData.hours,
             comment: formData.comment,
-            date: formatter.format(time),
-            userID: 1, //TODO OR DELETE
+            date: formatter.format(time)
           }),
         });
         const data = await response.json();
@@ -112,7 +111,7 @@ export default function WriteReview() {
       hours: '',
       comment: '',
     });
-    navigate(`/${school}/${department}/${code}`);
+    navigate(`/${school}/${department}/${name}`);
   };
 
   if (isLoading) {

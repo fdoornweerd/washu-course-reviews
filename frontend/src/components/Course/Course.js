@@ -10,7 +10,7 @@ export default function Course(){
     const [selectedProfessor, setSelectedProfessor] = useState(['','',''])
     const navigate = useNavigate();
 
-    const { school, department, code } = useParams();
+    const { school, department, name } = useParams();
     
     const fetchCourse = useCallback(async () => {
         try {
@@ -20,7 +20,7 @@ export default function Course(){
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({school: school, department: department, code: code}),
+            body: JSON.stringify({school: school, department: department, name: name}),
           });
           const data = await response.json();
           setCourse(data);
@@ -29,11 +29,11 @@ export default function Course(){
         } finally {
             setIsLoading(false);
         }
-      }, [school, department,code]);
+      }, [school, department,name]);
 
       useEffect(() => {
         fetchCourse();
-      }, [fetchCourse, school, department,code]);
+      }, [fetchCourse, school, department,name]);
   
 
 
@@ -52,8 +52,8 @@ export default function Course(){
       window.open(`https://www.ratemyprofessors.com/search/professors/1147?q=${nameSearch}`, '_blank', 'noopener,noreferrer');
     }
     
-    const writeReview = (schoolNav,deptNav,codeNav) => {
-      navigate(`/${schoolNav}/${deptNav}/${codeNav}/review`);
+    const writeReview = (schoolNav,deptNav,nameNav) => {
+      navigate(`/${schoolNav}/${deptNav}/${nameNav}/review`);
     }
 
     const selectNewProfessor = (event) => {
@@ -85,9 +85,9 @@ export default function Course(){
     }
     return (
         <div className="course-body">
-        <h2>{course.name} - {course.code}</h2>
+        <h2>{course.name}</h2>
         <div className="review-btn-container">
-          <button className="course-action-btn" onClick={() => writeReview(school, department, code)}>Write a Review</button>
+          <button className="course-action-btn" onClick={() => writeReview(school, department, name)}>Write a Review</button>
         </div>
         <div>
           Most Recently Offered: {course.lastOffered}
@@ -124,7 +124,7 @@ export default function Course(){
         <div>
           <p>Reviews For {selectedProfessor[0] === '' ? 'All Professors' : selectedProfessor[0]}</p>
           {course.reviews.map((review) => (
-            (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[1])) && (
+            (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[0])) && (
             <div className = "review">
               <div className="difficulty-quality">
               <p id = "quality">Quality: {review.quality}</p>
