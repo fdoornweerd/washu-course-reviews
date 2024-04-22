@@ -158,10 +158,18 @@ async function insertReview(quality, difficulty, instructor, hours, comment, dat
         "date": datePosted
     }
 
+    const reviewedCourse = await courses.findOne({name: courseName});
+
+
     const result = await courses.updateOne(
         { name: courseName },
-        { $push: 
-            { reviews: JSON_review} 
+        { 
+            $push: { reviews: JSON_review},
+            $set: {
+                numScores: reviewedCourse.numScores + 1,
+                avgQuality: ((reviewedCourse.numScores*reviewedCourse.avgQuality)+parseInt(quality))/(reviewedCourse.numScores + 1),
+                avgDifficulty: ((reviewedCourse.numScores*reviewedCourse.avgDifficulty)+parseInt(difficulty))/(reviewedCourse.numScores + 1),
+            }
         }
     );
 

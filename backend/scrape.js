@@ -192,9 +192,8 @@ async function getClasses(){
                             "courseDetails":courseDetails,
                             "lastOffered": semester,
                             "numScores": 0,
-                            "meanScore": -1,
-                            "minInstructorScore": -1,
-                            "maxInstructorScore": -1,
+                            "avgDifficulty": 0,
+                            "avgQuality": 0,
                             "reviews": []
                         }
                     );
