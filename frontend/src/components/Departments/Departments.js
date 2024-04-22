@@ -49,7 +49,7 @@ export default function Departments({ school}) {
     }
 
   return(
-   <div>
+   <div class = "body-container">
       <h2> {school} Departments:</h2>
       <div className = "depts">
         {departments.map((dept) => (

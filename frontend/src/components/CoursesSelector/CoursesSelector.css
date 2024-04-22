@@ -7,27 +7,37 @@
 }
 
 .course-body{
-    margin:0em 4em 4em 4em;
+    margin:2em 2em 2em 2em;
 }
-
+.course-buttons{
+    margin-left: 1em;
+    margin-right: 1em;
+}
 #search{
     margin-right: 1em;
 }
+input[type = "text"]{
+    padding-left: 1em;
+    width:80%;
+}
 li{
     list-style-type: none;
+    display: inline;
+    align-items:center;
 }
 .course-btn{
-    background-color: transparent;
-    border: none;
+    width:20%;
+    background-color: rgb(239, 239, 239);
+    border: .1em solid #2E6939;
+    height: 10em;
     color: #2E6939;
-    margin: 1em 0em 1em 4em;
-}
-.course-btn:hover{
-    color: #1B4726;
-    text-decoration: underline;
+    margin: 2em;
 }
 .search-bar{
+    width:100%;
+    background-color:#C0CCA4;
+    border: .1em solid #2E6939;
     justify-content: center;
-    margin: 2em;
+    padding: 1em 0em 1em 1em;
     display: flex;
 }

@@ -1,25 +1,25 @@
 .dept-btn{
-    width:12em;
-    height: 8em;
-    background-color: #E5DED6;
-    border: .1em solid #D33C41;
-    color: #D33C41;
-    margin: 5em 1.5em 5em 1.5em;
+    width:25%;
+    height: 9em;
+    background-color: #606E52;
+    border: .2em solid #C0CCA4;
+    color: white;
+    margin: 3em 2em 3em 2em;
     text-align: center;
 }
 .dept-btn:hover{
-    background-color: #cdc7bf;
+    background-color: #708160;
 }
 .depts{
-    padding: 0em 4em 4em 4em;
     max-width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
+
 h2{
-    padding:2em;
-    color:#D33C41;
+    padding:2em 0em 0em 2em;
+    color:#474747;
     display: flex;
     justify-content: left;
 }

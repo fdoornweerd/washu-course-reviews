@@ -1,9 +1,19 @@
 .App {
   text-align: center;
 }
+body{
+  background-color: #ffffff;
+}
 *{
   font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
-h1{
-  color: #D33C41;
+.title{
+  color: #474747;
 }
+/*
+dark grey:#474747
+light grey: #8F8B84
+Dark green: #606E52
+med green: #91A56E
+light green: #C0CCA4
+*/

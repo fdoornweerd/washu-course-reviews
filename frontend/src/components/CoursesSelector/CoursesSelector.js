@@ -74,11 +74,13 @@ export default function CoursesSelector(){
           onChange={inputChange}
       />
       </div>
+      <div className="course-buttons">
         {filteredCourses.map((course) => (
             <li key = {course.id}>
-              <button className ="course-btn" key={course.id} onClick={ () => courseClick(course.school,course.department,course.code)}>{course.code} - {course.name}</button>
+              <button className ="course-btn" key={course.id} onClick={ () => courseClick(course.school,course.department,course.code)}>{course.name}</button>
             </li>
         ))}
+        </div>
         </div>
     )
 }
