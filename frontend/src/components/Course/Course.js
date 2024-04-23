@@ -85,10 +85,18 @@ export default function Course(){
     }
     return (
         <div className="course-body">
-        <h2>{course.name}</h2>
+           <div className = "top-bar">
+              <div className="btn-container">
+              <button className = "back-btn" onClick={() => navigate(-1)}>Back</button>
+              </div> 
+              <div className="title-container">
+              <h2>{course.name}</h2>
+              </div>
+            </div>
         <div className="review-btn-container">
           <button className="course-action-btn" onClick={() => writeReview(school, department, name)}>Write a Review</button>
         </div>
+        <div className="content-container">
         <div>
           Most Recently Offered: {course.lastOffered}
         </div>
@@ -144,7 +152,7 @@ export default function Course(){
             </div>
             )
           ))}
-
+</div>
         </div>
 
 

@@ -5,10 +5,7 @@
     justify-content: center;
     margin-top: 25%;
 }
-.course-body{
-    margin-left: 4em;
-    margin-right: 4em;
-}
+
 .difficulty-quality{
     display:flex;
     width:100%;
@@ -17,6 +14,10 @@
 }
 .professor-review{
     display: block;
+}
+.content-container{
+    width:100%;
+    padding:2em;
 }
 #quality{
     margin-right: 1em;
@@ -27,6 +28,10 @@
     color:gray;
     font-size: .8em;
     justify-content: right;
+}
+.top-bar{
+    width: 100%;
+    background-color: #C0CCA4;;
 }
 .review{
     border:.1em solid #2E6939;

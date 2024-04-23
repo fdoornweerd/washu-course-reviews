@@ -64,7 +64,14 @@ export default function CoursesSelector(){
     
     return (
           <div className="course-list">
-        <h2>COURSES for {department}:</h2>
+            <div className = "white top-bar">
+              <div className="btn-container">
+              <button className = "back-btn" onClick={() => navigate(-1)}>Back</button>
+              </div> 
+              <div className="title-container">
+              <h2>COURSES for: {department}</h2>
+              </div>
+            </div>
         <div className = "search-bar">
         <p id = "search">Search for course</p>
         <input

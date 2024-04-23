@@ -2,6 +2,7 @@ import React, { useState, useEffect,useCallback } from "react";
 import { useParams } from "react-router-dom";
 import ReactLoading from "react-loading";
 import { useNavigate } from "react-router-dom";
+import { FaStar } from "react-icons/fa";
 import "./Review.css";
 
 export default function WriteReview() {
@@ -10,6 +11,7 @@ export default function WriteReview() {
 
   const [course, setCourse] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [rating,setRating] = useState(0)
   const [formData, setFormData] = useState({
     prof: [],
     quality: '',
@@ -122,26 +124,57 @@ export default function WriteReview() {
     </div>
     )  
   }
-
-
   return (
+    <>
+    <div className = "top-bar">
+    <div className="btn-container">
+    <button className = "back-btn" onClick={() => navigate(-1)}>Back</button>
+    </div> 
+    <div className="title-container">
+    <h2>Review for: {course.name}</h2>
+    </div>
+    </div>
     <form id="loginForm" onSubmit={handleSubmit}>
-      <label htmlFor="prof">(hold shift to select multiple) Professor:</label>
-      <select multiple name='prof' id='prof' value={formData.prof} onChange={handleChange}>
-        {course.instructors.map((instructor, index) => (
-            <option key={index} value={index}>
-                {instructor.lastName}
-            </option>
-        ))}
-      </select>
-      
-      <label htmlFor="quality">Quality:</label>
-      <input type="number" id="quality" name="quality" value={formData.quality} onChange={handleChange}></input>
-      
+      <div className = "form-container">
+      <div className = "input-section">
+      <label> Professor: </label>
+      <details>
+        <summary> Choose one or many</summary>
+      <ul>
+      {course.instructors.map((instructor, index) => (
+            <li key = {index}> <label> <input type = "checkbox" name = "fc" value = {instructor.lastName} onChange={handleChange}/>{instructor.lastName}</label>
+            </li>
+      ))}
+      </ul>
+      </details>
+      </div>
+      <div className = "input-section">
+        <label htmlFor="rating"> Quality: </label>
+      {[...Array(5)].map((_, index) => {
+    const givenRating = index + 1;
+    return (
+      <label key={index}>
+        <input
+          type="radio"
+          name="rating"
+          value={givenRating}
+          checked={rating === givenRating}
+          onChange={handleChange}
+          onClick={() => setRating(givenRating)}
+        />
+        <FaStar
+          color={givenRating <= rating ? "#FCD12A" : "rgb(192,192,192)"}
+          className="star"
+        />
+      </label>
+    );
+  })}
+      </div>
+      <div className = "input-section">
       <label htmlFor="difficulty">Difficulty:</label>
       <input type="number" id="difficulty" name="difficulty" value={formData.difficulty} onChange={handleChange}></input>
-
-
+      </div>
+      <div className = "input-section">
       <label htmlFor="hours">Hours Per Week:</label>
       <select name='hours' id='hours' value={formData.hours} onChange={handleChange}>
         {hourOptions.map((time, index) => (
@@ -150,11 +183,26 @@ export default function WriteReview() {
             </option>
         ))}
        </select>
-      
+      </div>
+      <div className = "input-section">
       <label htmlFor="comment">Comment:</label>
       <textarea id="comment" name="comment" rows="4" cols="50" value={formData.comment} onChange={handleChange}></textarea>
       
       <input type="submit"></input>
+      </div>
+      </div>
     </form>
+    </>
   );
 }
+/* 
+<label for="prof">(hold shift to select multiple) Professor:</label>
+<select multiple name='prof' id='prof' value={formData.prof} onChange={handleChange}>
+        {course.instructors.map((instructor, index) => (
+            <option key={index} value={index}>
+                {instructor.lastName}
+            </option>
+        ))}
+      </select>
+   <input type="number" id="quality" name="quality" value={formData.quality} onChange={handleChange}></input>
+      </div>*/
