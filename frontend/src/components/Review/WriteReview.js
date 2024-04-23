@@ -12,6 +12,7 @@ export default function WriteReview() {
   const [course, setCourse] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [rating,setRating] = useState(0)
+  const [hover, setHover] = useState(null);
   const [formData, setFormData] = useState({
     prof: [],
     quality: '',
@@ -163,8 +164,10 @@ export default function WriteReview() {
           onClick={() => setRating(givenRating)}
         />
         <FaStar
-          color={givenRating <= rating ? "#FCD12A" : "rgb(192,192,192)"}
+           color = {givenRating <= (hover || rating) ? "#ffc107" : "#e4e5e9"}
           className="star"
+          onMouseEnter={() => setHover(givenRating)}
+          onMouseLeave={() => setHover(null)}
         />
       </label>
     );

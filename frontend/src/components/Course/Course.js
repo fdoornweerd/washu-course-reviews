@@ -6,7 +6,8 @@ import "./Course.css";
 export default function Course(){
     const [course, setCourse] = useState([])
     const [isLoading, setIsLoading] = useState(true)
-    const [ isDetailsShown, setIsDetailsShown ] = useState(false);
+    const [isDetailsShown, setIsDetailsShown ] = useState(false);
+    const [isAnimated, setIsAnimated] = useState(false);
     const [selectedProfessor, setSelectedProfessor] = useState(['','',''])
     const navigate = useNavigate();
 
@@ -34,12 +35,12 @@ export default function Course(){
       useEffect(() => {
         fetchCourse();
       }, [fetchCourse, school, department,name]);
-  
-
-
-    const toggleDescription = () => {
-      setIsDetailsShown(!isDetailsShown);
-    }
+      
+      const animatedStyle = {animation: "inAnimation 400ms ease-in"};
+      const unanimatedStyle = {
+        animation: "outAnimation 400ms ease-out",
+        animationFillMode: "forwards"
+      };
 
     const openRateMyProfessor = (fullName) => {
       let nameSearch;
@@ -93,19 +94,24 @@ export default function Course(){
               <h2>{course.name}</h2>
               </div>
             </div>
+        <div className = "detail">
+          <button id = "description-btn"onClick={() => {
+            setIsAnimated(!isAnimated)
+            if (!isDetailsShown) setIsDetailsShown(true); 
+          }}>{isDetailsShown === true ? 'Hide Course Description' : 'Show Course Description'}</button>
+          {isDetailsShown && <div className="description" style={isAnimated ? animatedStyle : unanimatedStyle} onAnimationEnd={() => { if (!isAnimated) setIsDetailsShown(false) }}>
+            <p id = "course-details">{course.courseDetails}</p>
+            </div>}
+        </div>
         <div className="review-btn-container">
-          <button className="course-action-btn" onClick={() => writeReview(school, department, name)}>Write a Review</button>
+          <button id = "write-review-btn" onClick={() => writeReview(school, department, name)}>Write a Review</button>
         </div>
         <div className="content-container">
-        <div>
+        <div className="content-and-btn">
           Most Recently Offered: {course.lastOffered}
         </div>
-        <div>
-          {!isDetailsShown && <button onClick={()=> toggleDescription()}>Open Description</button>}
-          {isDetailsShown && <button onClick={()=> toggleDescription()}>Close Description</button>}
-          {isDetailsShown && <p>{course.courseDetails}</p>}
-        </div>
-        <div>
+        <div className="review-top-bar">
+        <div className="content-and-btn">
           <p>Select Professor:</p>
           <select onChange={selectNewProfessor}>
             <option key={-1} value="All Professors">All Professors</option>
@@ -130,7 +136,9 @@ export default function Course(){
           }
         </div>
         <div>
-          <p>Reviews For {selectedProfessor[0] === '' ? 'All Professors' : selectedProfessor[0]}</p>
+          <h3>Reviews For {selectedProfessor[0] === '' ? 'All Professors' : selectedProfessor[0]}</h3>
+          </div>
+          </div>
           {course.reviews.map((review) => (
             (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[0])) && (
             <div className = "review">
@@ -152,7 +160,6 @@ export default function Course(){
             </div>
             )
           ))}
-</div>
         </div>
 
 

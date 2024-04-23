@@ -21,8 +21,6 @@
 h2{
     padding:1em;
     color:#474747;
-    display: flex;
-    justify-content: left;
 }
 .loadingScreen{
     width: 100%;

@@ -53,20 +53,19 @@ input[type = "text"]{
 .title-container{
     width: 100%;
     display: flex;
-    justify-content: center;
 }
 .btn-container{
-display: flex;
-justify-content: left;
-padding-left:1em;
+padding-left:2em;
+width:40%;
 }
 .back-btn{
     background-color: #1B4726;
     color:#E5DED6;
-    width:10em;
+    width:8em;
     height: 3em;
     font-weight: bold;
 }
+
 .back-btn:hover{
 background-color: #2E6939;;
 }

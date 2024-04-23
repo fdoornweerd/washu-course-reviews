@@ -5,7 +5,28 @@
     justify-content: center;
     margin-top: 25%;
 }
-
+@keyframes inAnimation {
+    0% {
+      opacity: 0;
+      max-height: 0px;
+    }
+    100% {
+      opacity: 1;
+      max-height: 600px;
+    }
+  }
+  
+  @keyframes outAnimation {
+    0% {
+      opacity: 1;
+      max-height: 35em;
+    }
+    100% {
+      opacity: 0;
+      max-height: 0em;
+    }
+  }
+  
 .difficulty-quality{
     display:flex;
     width:100%;
@@ -15,9 +36,33 @@
 .professor-review{
     display: block;
 }
+#write-review-btn{
+    width:12em;
+    height:3em;
+
+}
+.detail{
+    margin: 2em;
+    display: flex;
+    flex-direction: column;
+}
+#description-btn{
+width:15em;
+height: 3em;
+border-radius: 5%;
+border: none;
+}
+
+.content-and-btn{
+    display:flex;
+}
 .content-container{
-    width:100%;
     padding:2em;
+}
+#course-details{
+    padding:1em 2em 2em 2em;
+    border-radius: 5%;
+    background-color: #E5DED6;
 }
 #quality{
     margin-right: 1em;
@@ -30,7 +75,6 @@
     justify-content: right;
 }
 .top-bar{
-    width: 100%;
     background-color: #C0CCA4;;
 }
 .review{
