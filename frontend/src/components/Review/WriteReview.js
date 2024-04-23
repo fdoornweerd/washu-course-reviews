@@ -149,14 +149,14 @@ export default function WriteReview() {
       </details>
       </div>
       <div className = "input-section">
-        <label htmlFor="rating"> Quality: </label>
+        <label htmlFor="quality"> Quality: </label>
       {[...Array(5)].map((_, index) => {
     const givenRating = index + 1;
     return (
       <label key={index}>
         <input
           type="radio"
-          name="rating"
+          name="quality"
           value={givenRating}
           checked={rating === givenRating}
           onChange={handleChange}
