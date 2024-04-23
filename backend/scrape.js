@@ -45,7 +45,7 @@ async function getClasses(){
 
     const jsonData = [];
 
-    for(let i=0; i<1; i++){
+    for(let i=0; i<numSchoolLinks; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -68,15 +68,20 @@ async function getClasses(){
         const numDeptLinks = deptLinks.length;
 
 
-        for(let j=0; j<2; j++){
+        for(let j=0; j<numDeptLinks; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
             deptLinks = await deptContainer.findElements(By.css('a'));
-    
+
+            
+
             const currLinkD = deptLinks[j];
             const deptName = await currLinkD.getText();
 
+            await driver.actions({ bridge: true }).move({ duration: 500, origin: currLinkD }).perform();
+
             if(deptName != 'All Departments(All)'){
+                
                 await currLinkD.click();
 
                 // Wait for classes to load and loading bar to go away
@@ -95,9 +100,9 @@ async function getClasses(){
                 let classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
                 const numClassLinks = classLinks.length;
 
-                const num = numClassLinks > 3 ? 3 : numClassLinks
+                const num = numClassLinks > 0 ? numClassLinks-1 : 0
                 
-                for(let k=0; k<num; k++){
+                for(let k=0; k<numClassLinks; k++){
                     // update so links dont become stale
                     classContainer = await driver.findElement(By.xpath(classXPath));
                     classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
@@ -138,41 +143,48 @@ async function getClasses(){
                         const instructorContainer = section.findElement(By.css('table > tbody > tr:nth-child(1) > td:nth-child(6)'));
                         const instructorLink = await instructorContainer.findElements(By.css('a'));
 
-                        
                         // go through each instructor for the course (1 or more) and click on their name to get full name
                         if(instructorLink.length > 0){
+                            // hover to prevent shifting text issue
+                            await driver.actions({ bridge: true }).move({ duration: 300, origin: section }).perform();
+
                             // if same instructor is teaching multiple sections no need to click on their name multiple times
                             for(const instructor of instructorLink) {
                                 const instructorLastName = await instructor.getText()
-                                if(!insturctorsForCourse.includes(instructorLastName)){
-                                    insturctorsForCourse.push(instructorLastName);
+                            
+                                 // click on instuctor to get brought to profile
+                                 await instructor.click();
+                
+                                 //switch windows
+                                 let windowHandles = await driver.getAllWindowHandles();
+                                    
+                                 // Switch to the newly opened tab
+                                 await driver.switchTo().window(windowHandles[windowHandles.length - 1]);
+                                
 
-                                    // hover to prevent shifting text issue
-                                    await driver.actions({ bridge: true }).move({ duration: 250, origin: section }).perform();
-
-                                    // click on instuctor to get brought to profile
+                                 //get FULL instructor name 
+                                 let element;
+                                 try {
+                                    element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
+                                 } catch(err){
+                                    // couldn't click on name so click again and do steps
                                     await instructor.click();
-                    
-                                
-
-                                    //switch windows
-                                    const windowHandles = await driver.getAllWindowHandles();
-                                    
-                                    // Switch to the newly opened tab
+                                    windowHandles = await driver.getAllWindowHandles();
                                     await driver.switchTo().window(windowHandles[windowHandles.length - 1]);
+                                    element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
+                                 }
                                 
-
-                                    //get FULL instructor name 
-                                    const element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 60000);
-                                    const fullName = await element.getText();
+                                 const fullName = await element.getText();
                         
-                                    // close current window
-                                    await driver.close();
+                                // close current window
+                                await driver.close();
                                     
-                                    // switch back to courses
-                                    await driver.switchTo().window(windowHandles[0]); 
+                                // switch back to courses
+                                await driver.switchTo().window(windowHandles[0]); 
                                     
-                                    // add instructor
+                                // add instructor if it doesnt exist already
+                                if(!insturctorsForCourse.includes(fullName)){
+                                    insturctorsForCourse.push(fullName);
                                     instructorNames.push({"lastName":instructorLastName,"fullName":fullName, "semestersTaught":[semester]});
                                 }
                             }
