@@ -14,7 +14,7 @@ async function getClasses(){
 
 
     //select semester to update (0 is most recent option)
-    const SEMESTERS_BACK = 0;
+    const SEMESTERS_BACK = 3;
     const adjusted = 2*SEMESTERS_BACK + 1;
 
     // click on semester to scrape
@@ -45,7 +45,7 @@ async function getClasses(){
 
     const jsonData = [];
 
-    for(let i=0; i<2; i++){
+    for(let i=0; i<numSchoolLinks; i++){
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));

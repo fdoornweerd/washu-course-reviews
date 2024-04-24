@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import ReactLoading from "react-loading";
 import './CoursesSelector.css';
 
@@ -10,6 +10,7 @@ export default function CoursesSelector(){
     const [isLoading, setIsLoading] = useState(true)
     const { school, department } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const filteredCourses = courses.filter(course =>
       course.code.some(code => code.toLowerCase().includes(inputValue.toLowerCase())) ||
@@ -17,8 +18,8 @@ export default function CoursesSelector(){
       (course.instructors && course.instructors.some(instructor => instructor.fullName.toLowerCase().includes(inputValue.toLowerCase())))
   );
 
-  const colors = ["#D3D3D3","#ff7f7f","#ff7f7f","#FFF03A","#90EE90","#D3D3D3"];//grey, red, yellow, green
-
+  const colors = ["#D3D3D3","#E96347","#ff7f7f","#fce803","#DFFF00","#85F485"];//grey, red, yellow, green
+  const difficultColors= ["D3D3D3","#85F485","#DFFF00","#fce803","#ff7f7f","#E96347"];
 
     //async function fetchCourses(){
       const fetchCourses = useCallback(async () => {
@@ -63,15 +64,16 @@ export default function CoursesSelector(){
       const inputChange = (event) => {
         setInputValue(event.target.value);
       };
+
     
     return (
           <div className="course-list">
             <div className = "white top-bar">
               <div className="btn-container">
-              <button className = "back-btn" onClick={() => navigate(-1)}>Back</button>
+              <button className = "back-btn" onClick={() => {navigate(`/`);}}>Back</button>
               </div> 
               <div className="title-container">
-              <h2>COURSES for: {department}</h2>
+              <h2>{department == undefined ? 'Courses' : `Courses for ${department}`}</h2>
               </div>
             </div>
         <div className = "search-bar">
@@ -90,13 +92,13 @@ export default function CoursesSelector(){
                 <div className = "rating-container">
                   <p className = "rating-label">Quality:</p>
                   <div className = "rating-box" style={{backgroundColor: colors[Math.floor(course.avgQuality)]}}>
-                    <p className = "rating-box-num">{course.avgQuality >0 ? course.avgQuality.toFixed(2) : 'N/A'}</p>
+                    <p className = "rating-box-num">{course.avgQuality >0 ? course.avgQuality.toFixed(1) : 'N/A'}</p>
                   </div>
                 </div>
                 <div className = "rating-container">
                   <p className = "rating-label">Difficulty:</p>
-                  <div className = "rating-box" style={{backgroundColor: colors[Math.floor(course.avgDifficulty)]}}>
-                    <p className = "rating-box-num">{course.avgDifficulty >0 ? course.avgDifficulty.toFixed(2) : 'N/A'}</p>
+                  <div className = "rating-box" style={{backgroundColor: (course.avgDifficulty==0 ? "#D3D3D3" : difficultColors[Math.round((course.avgDifficulty))])}}>
+                    <p className = "rating-box-num">{course.avgDifficulty >0 ? course.avgDifficulty.toFixed(1) : 'N/A'}</p>
                   </div>
                 </div>
                 <div id = "rest-of-li">

@@ -1,5 +1,4 @@
 const { MongoClient } = require("mongodb");
-const OpenAI = require("openai");
 require('dotenv').config();
 
 
@@ -54,9 +53,9 @@ async function getCourses(school, department){
 
     try{
         if(department == 'all'){
-            return await courses.find().toArray();
+            return await courses.find().sort({ numScores: -1 }).toArray();
         } else{
-            return await courses.find({department: department, school: school}).toArray();
+            return await courses.find({department: department, school: school}).sort({ numScores: -1 }).toArray();
         }
         
     
@@ -210,48 +209,6 @@ async function fetchReviews(courseName, instructor){
 
 
 
-async function summarizeReviews(courseName) {
-    const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-    const client = new MongoClient(uri);
-    const database = client.db('RateMyCourse');
-    const courses = database.collection('courses');
-
-    const result = await courses.findOne(
-        {name: courseName}
-    )
-    await client.close();
-
-
-    let reviews;
-    if(result == null){
-        reviews = [];
-    } else{
-        reviews = result.reviews || [];
-    }
-
-    let reviewString = "";
-    for(let i=0; i<reviews.length; i++){
-        reviewString+= `review ${i+1}: ${reviews[i].comment}`
-    }
-
-   
-
-    const openai = new OpenAI({
-        apiKey: process.env.OPEN_AI_KEY,
-    });
-
-    const chatCompletion = await openai.chat.completions.create({
-        messages: [
-            {role: "system", content: "You are an assistant that takes in a list of reviews, and then outputs a sumarized version of the reviews in no more than 3 sentences. If the string is empty output 'there are no reviews yet'"},
-            { role: "user", content: reviewString}
-        ],
-        model: "gpt-3.5-turbo",
-    });
-
-  return chatCompletion.choices[0].message.content;
-}
-
 
 
 
@@ -264,7 +221,6 @@ module.exports = {
     getProfessorLink,
     insertReview,
     fetchReviews,
-    summarizeReviews
 };
 
 

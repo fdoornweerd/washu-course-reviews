@@ -24,6 +24,8 @@ export default function WriteReview() {
     hours: '',
     comment: '',
   });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   const hourOptions = ['1','2-4', '5-8', '9-12', '13+'];
   const time = new Date();
   const formatter = new Intl.DateTimeFormat('en-US', {
@@ -55,7 +57,6 @@ export default function WriteReview() {
         setCourse(data);
         setFormData(prevFormData => ({
           ...prevFormData,
-          prof: data.instructors && data.instructors.length > 0 ? data.instructors[0] : '',
           hours: hourOptions[0],
         }));
       } catch (error) {
@@ -72,9 +73,6 @@ export default function WriteReview() {
 
 
     const insertReview = async () => {
-
-      let instructorsInsert = formData.prof.length > 0 ? formData.prof.map(idx => course.instructors[idx].lastName) : [];
-
       try {
         const response = await fetch("http://localhost:3456/insertReview", {
           method: "POST",
@@ -83,7 +81,7 @@ export default function WriteReview() {
           },
           body: JSON.stringify({ 
             name: name,
-            professor: instructorsInsert,
+            professor: formData.prof,
             quality: formData.quality,
             difficulty: formData.difficulty,
             hours: formData.hours,
@@ -98,13 +96,25 @@ export default function WriteReview() {
     };
 
   const handleChange = (e) => {
-    const { name, value, options } = e.target;
-    if (name === 'prof' && options) {
-      const selectedValues = Array.from(options).filter(option => option.selected).map(option => option.value);
-      setFormData(prevState => ({
-        ...prevState,
-        [name]: selectedValues
-      }));
+    const { name, value } = e.target;
+    if (name === 'prof') {
+      setFormData(prevState => {
+        const newProfs = [...prevState.prof];
+        
+        if (newProfs.includes(value)) {
+          return {
+            ...prevState,
+            prof: newProfs.filter(el => el !== value)
+          };
+        } else {
+
+          newProfs.push(value);
+          return {
+            ...prevState,
+            prof: newProfs
+          };
+        }
+      });
     } else{
       setFormData(prevState => ({
         ...prevState,
@@ -125,6 +135,7 @@ export default function WriteReview() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormSubmitted(true);
     const response = await insertReview();
     setFormData({
       prof: '',
@@ -162,7 +173,7 @@ export default function WriteReview() {
         <summary> Choose one or many</summary>
       <ul id = "dropdown">
       {course.instructors.map((instructor, index) => (
-            <li key = {index}> <label> <input type = "checkbox" name = "fc" value = {instructor.lastName} onChange={handleChange}/>{instructor.lastName}</label>
+            <li key = {index}> <label> <input type = "checkbox" name = "prof" value = {instructor.lastName} onChange={handleChange}/>{instructor.lastName}</label>
             </li>
       ))}
       </ul>
@@ -238,7 +249,7 @@ export default function WriteReview() {
       <textarea id="comment" name="comment" rows="5" cols="60" value={formData.comment} onChange={handleChange}></textarea>
       </div>
       <div id = "submit">
-      <input className = "course-action-btn"type="submit"></input>
+      <input className = "course-action-btn" type="submit" disabled={formData.quality === '' || formData.difficulty === '' || formSubmitted}></input>
       </div>
       </div>
     </form>

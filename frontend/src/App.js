@@ -4,7 +4,6 @@ import Tabs from './components/Tabs/Tabs';
 import CoursesSelector from './components/CoursesSelector/CoursesSelector';
 import Course from './components/Course/Course';
 import WriteReview from './components/Review/WriteReview';
-import ViewAll from './components/ViewAll/ViewAll';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 function App() {

@@ -1,4 +1,4 @@
-const { getSchools, getDepartments, getCourses, searchCourses,insertReview, fetchReviews,summarizeReviews } = require('./functions');
+const { getSchools, getDepartments, getCourses, searchCourses,insertReview, fetchReviews } = require('./functions');
 
 async function test() {
     try {
@@ -10,7 +10,7 @@ async function test() {
         // console.log(await insertReview(5,1,["dad","mr. mark"], "B", "The professor wasnt very good in class but was super helpful during office hours. The material of this class is kind of boring and is hard to pay attention to. I wish i didnt take it.","1","1","A46 ARCH 175"));
         // console.log(await insertReview(5,1,["mom","mr. mark"], "B", "I HATE THIS CLASS. the professor didnt care about the students at all, and the tests are super hard and not like the practice exams. I would sometimes go to office hours but he was never helpful during them, and didnt seem like he cared at all. This class has been the worst of my entire college experience.","1","1","A46 ARCH 175"));
         // console.log(await fetchReviews("A46 ARCH 175", "mr. mark"))
-        // console.log(await summarizeReviews("A46 ARCH 175"));
+        console.log(await summarizeReviews("Beginning Greek I"));
 
        // console.log(await getCourses("Architecture", "LANDSCAPE ARCHITECTURE(A48)"))
     } catch (error) {

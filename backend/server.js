@@ -1,6 +1,11 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 var cors = require('cors');
+
+const { MongoClient } = require("mongodb");
+const OpenAI = require("openai");
+require('dotenv').config();
+
 const {
     getSchools,
     getDepartments,
@@ -79,6 +84,36 @@ app.post('/insertReview', async (req, res) => {
         const date = req.body.date;
 
         await insertReview(quality, difficulty, professor, hours, comment, date, courseName)
+        res.json(true);
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        res.status(500).json({ error: "Failed to fetch courses" });
+    }
+});
+
+app.post('/logIn', async (req, res) => {
+    try {
+        const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+        const client = new MongoClient(uri);
+        const database = client.db('RateMyCourse');
+        const users = database.collection('users');
+    
+        try{
+            const un = req.body.user
+            await users.insertOne(un);
+            
+        
+        } catch (err){
+            console.error('Error fetching courses:', err);
+            return [];
+        } finally {
+            await client.close();
+        }
+
+
+
+
         res.json(true);
     } catch (error) {
         console.error("Error fetching courses:", error);

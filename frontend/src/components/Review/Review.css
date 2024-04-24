@@ -100,3 +100,9 @@ li> label:hover,
 li > label:has(input:checked) {
     background-color:rgb(239, 239, 239);
 }
+.course-action-btn:disabled {
+    background-color: #ccc; 
+    color: #666;          
+    cursor: not-allowed;   
+    border: 1px solid #999;
+}

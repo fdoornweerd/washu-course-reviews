@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ReactLoading from "react-loading";
 import "./Course.css";
 
@@ -10,10 +10,11 @@ export default function Course(){
     const [isAnimated, setIsAnimated] = useState(false);
     const [selectedProfessor, setSelectedProfessor] = useState(['','',''])
     const navigate = useNavigate();
+    const location = useLocation();
 
     const { school, department, name } = useParams();
-    const colors = ["#D3D3D3","#ff7f7f","#ff7f7f","#FFF03A","#90EE90","#D3D3D3"];//grey, red, yellow, green
-    const difficultColors= ["#00FF00","#DFFF00","#ffc107","#ff7f7f","#FF5733"];
+    const colors = ["#D3D3D3","#E96347","#ff7f7f","#fce803","#DFFF00","#85F485"];
+    const difficultColors= ["#85F485","#DFFF00","#fce803","#ff7f7f","#E96347"]; //green, green yellow, yellow, light red, dark red
     const fetchCourse = useCallback(async () => {
         try {
             setIsLoading(true);
@@ -67,7 +68,6 @@ export default function Course(){
         lastName = course.instructors[idx].lastName;
         fullName = course.instructors[idx].fullName;
         semestersTaught = course.instructors[idx].semestersTaught;
-  
       } else{
         lastName = '';
         fullName = '';
@@ -85,11 +85,19 @@ export default function Course(){
       </div>
       )  
     }
+
+    const handleBack = () => {
+
+      navigate(`/${location.pathname.split('/')[1]}/${location.pathname.split('/')[2]}`)
+
+    }
+      
+
     return (
         <div className="course-body">
            <div className = "top-bar">
               <div className="btn-container">
-              <button className = "back-btn" onClick={() => navigate(-1)}>Back</button>
+              <button className = "back-btn" onClick={handleBack}>Back</button>
               </div> 
               <div className="title-container">
               <h2>{course.name}</h2>
@@ -143,7 +151,7 @@ export default function Course(){
           <button id = "write-review-btn" onClick={() => writeReview(school, department, name)}><span>Write a Review</span></button>
         </div>
           {course.reviews.map((review) => (
-            (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[0])) && (
+            (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[0])) && ( 
             <div className = "review">
                <div className = "rating-container">
                   <p className = "rating-label">Quality:</p>
@@ -153,7 +161,7 @@ export default function Course(){
                 </div>
                 <div className = "rating-container">
                   <p className = "rating-label">Difficulty:</p>
-                  <div className = "rating-box" style={{backgroundColor: difficultColors[Math.round(review.difficulty -1)]}}>
+                  <div className = "rating-box" style={{backgroundColor: difficultColors[Math.round(review.difficulty-1)]}}>
                     <p className = "rating-box-num">{review.difficulty >0 ? review.difficulty: 'N/A'}</p>
                   </div>
                 </div>
