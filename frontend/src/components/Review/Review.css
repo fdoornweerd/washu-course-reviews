@@ -1,12 +1,24 @@
-
-.form-container{
+#reviewForm{
+    width:100%;
+    margin-top: 2em;
+    display: flex;
+    justify-content: center;
+}
+.form-container{ 
     padding: 2em;
 }
 .input-section{
-    margin:2em;
+    margin-bottom: 3em;
+    display: flex;
+    width:30em;
 }
-.input-section label{
-    margin-right: 1em;
+#submit{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+textarea{
+    resize: none;
 }
 select,
 details {
@@ -19,18 +31,39 @@ details {
     width:2em;
     height: 2em;
 }
+.squares{
+    margin:0;
+    padding:0;
+}
+.square{
+    height:3em;
+    width:3em;
+    margin: 0;
+    padding: 0;
+}
+#stars{
+    display: flex;
+    flex-direction: row;
+}
 input[type = "radio"]{
     visibility: hidden;
     display: none;
 }
-
+.shapes{
+    display: flex;
+}
+#tempText{
+    display: flex;
+    justify-content: right;
+    margin-left: 2em ;
+}
 select,
 summary {
     border: .1em solid #474747;
     border-collapse: collapse;
     border-radius: 5%;
     padding: .25em;
-    width: 11.2em;
+    width: 14em;
     background-color: white;
     cursor: pointer;
 }
@@ -44,13 +77,16 @@ label {
     display: inline-block;
     font-weight: bold;
 }
-ul {
+#dropdown {
     list-style: none;
+    width: 14.5em;
     margin: 0;
     padding: 0;
     border: .1em solid #474747;
+    max-height: 10em;
+    overflow-y: scroll;
 }
-li {
+li{
     margin: 0;
     padding: 0;
 }
@@ -58,8 +94,9 @@ li > label {
     cursor: pointer;
     display: inline-block;
     width: 100%;
+    padding :.5em;
 }
-li > label:hover,
+li> label:hover,
 li > label:has(input:checked) {
     background-color:rgb(239, 239, 239);
 }

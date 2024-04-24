@@ -27,19 +27,29 @@
     }
   }
   
-.difficulty-quality{
-    display:flex;
-    width:100%;
-    justify-content: right;
-    color: #1B4726;
-}
-.professor-review{
-    display: block;
-}
+
 #write-review-btn{
     width:12em;
     height:3em;
 
+}
+.professor-and-date{
+    padding-top: 0;
+    display:flex;
+    justify-content: space-between;
+    width:100%;
+}
+.review-stack{
+    width:100%;
+    margin-left: 4em;
+}
+.review{
+    display: flex;
+}
+.professor-container{
+    display: flex;
+    justify-content: left;
+    font-weight: bold;
 }
 .detail{
     margin: 2em;
@@ -47,53 +57,115 @@
     flex-direction: column;
 }
 #description-btn{
+    background-color:#dcdad7 ;
+margin-left: 2em;
 width:15em;
 height: 3em;
 border-radius: 5%;
 border: none;
 }
-
-.content-and-btn{
+#description-btn:hover{
+    background-color: #ccc6c0;
+}
+#before-reviews{
+    margin-bottom: 2em;
+}
+.btns{
+    padding:2em;
+    display: flex;
+    justify-content: space-between;
+}
+.review-top-bar{
     display:flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 2em;
+    margin-right: 2em;
 }
 .content-container{
     padding:2em;
 }
 #course-details{
     padding:1em 2em 2em 2em;
-    border-radius: 5%;
+    border-radius: 5px;
     background-color: #E5DED6;
 }
+
 #quality{
     margin-right: 1em;
 }
+.small{
+    font-size: smaller;
+}
+label{
+    margin-right: 1em;
+}
 #date{
-    width: 100%;
-    display:flex;
+    display: flex;
     color:gray;
     font-size: .8em;
+    font-weight: bold;
     justify-content: right;
 }
 .top-bar{
     background-color: #C0CCA4;;
 }
 .review{
-    border:.1em solid #2E6939;
+    border:none;
+    background-color: rgba(239, 239, 239,0.6);
+    border-radius: 5px;
     padding:1em;
+    margin: 2em 2em 2em 2em;
 }
 .review-btn-container{
-    margin-top: 2em;
-    margin-bottom: 2em;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+    margin:2em 2em 2em 0em;
+    width:100%;
+    display:flex;
+    justify-content: right;
 }
 .course-action-btn{
     background-color: #1B4726;
-    color:#E5DED6;
-    width:12em;
-    height: 3em;
+    color:white;
+    font-size: larger;
+    width:6em;
+    height: 2em;
+    border-radius: 5%;
 }
 .course-action-btn:hover{
 background-color: #2E6939;;
+}
+#write-review-btn{
+   margin-right: 2em;
+    border-radius: 5px;
+    width:10em;
+    background-color: #77C66E ;
+    border: none;
+    color: #ffffff;
+    text-align: center;
+    padding:1em;
+    cursor: pointer;
+    transition: all 0.5s;
+    box-shadow: 0 .5em 1em -.5em rgba(0, 0, 0,.7);
+    display: inline-block;
+    position:relative;
+    font-size: 1.1em;
+}
+#write-review-btn:after{
+    content:"\2192";
+    position: absolute;
+    opacity:0;
+    top:.2em;
+    right:-1.8em;
+    transition: 0.5s;
+}
+#write-review-btn:hover{
+    padding-right:1.6em;
+    padding-left: .5em;
+}
+
+#write-review-btn:hover:after{
+    opacity: 1;
+    right:0em;
+    font-size: 2em;
+    ;
 }

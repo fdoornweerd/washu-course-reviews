@@ -17,6 +17,8 @@ export default function CoursesSelector(){
       (course.instructors && course.instructors.some(instructor => instructor.fullName.toLowerCase().includes(inputValue.toLowerCase())))
   );
 
+  const colors = ["#D3D3D3","#ff7f7f","#ff7f7f","#FFF03A","#90EE90","#D3D3D3"];//grey, red, yellow, green
+
 
     //async function fetchCourses(){
       const fetchCourses = useCallback(async () => {
@@ -82,12 +84,30 @@ export default function CoursesSelector(){
       />
       </div>
       <div className="course-buttons">
-        {filteredCourses.map((course) => (
+      {filteredCourses.map((course) => (
             <li key = {course.id}>
+              <div className = "course-preview">
+                <div className = "rating-container">
+                  <p className = "rating-label">Quality:</p>
+                  <div className = "rating-box" style={{backgroundColor: colors[Math.floor(course.avgQuality)]}}>
+                    <p className = "rating-box-num">{course.avgQuality >0 ? course.avgQuality.toFixed(2) : 'N/A'}</p>
+                  </div>
+                </div>
+                <div className = "rating-container">
+                  <p className = "rating-label">Difficulty:</p>
+                  <div className = "rating-box" style={{backgroundColor: colors[Math.floor(course.avgDifficulty)]}}>
+                    <p className = "rating-box-num">{course.avgDifficulty >0 ? course.avgDifficulty.toFixed(2) : 'N/A'}</p>
+                  </div>
+                </div>
+                <div id = "rest-of-li">
               <button className ="course-btn" key={course.id} onClick={ () => courseClick(course.school,course.department,course.name)}>{course.name}</button>
+              </div>
+              </div>
+              
             </li>
         ))}
         </div>
         </div>
     )
 }
+

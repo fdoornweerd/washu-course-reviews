@@ -1,12 +1,15 @@
 .dept-btn{
     width:25%;
-    height: 9em;
+    height: 8em;
     background-color: #606E52;
+    border-radius: 5px;
     font-weight: bold;
     border: .2em solid #C0CCA4;
     color: white;
     margin: 3em 2em 3em 2em;
+    padding:1em;
     text-align: center;
+    font-size: 1.1em;
 }
 .dept-btn:hover{
     background-color: #708160;
@@ -19,7 +22,8 @@
 }
 
 h2{
-    padding:1em;
+    padding-top:1em;
+    padding-bottom: 1em;
     color:#474747;
 }
 .loadingScreen{

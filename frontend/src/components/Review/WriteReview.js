@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import ReactLoading from "react-loading";
 import { useNavigate } from "react-router-dom";
 import { FaStar } from "react-icons/fa";
+import { TbSquare } from "react-icons/tb";
 import "./Review.css";
 
 export default function WriteReview() {
@@ -12,7 +13,10 @@ export default function WriteReview() {
   const [course, setCourse] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [rating,setRating] = useState(0)
+  const [difficulty, setDifficulty] = useState(0)
   const [hover, setHover] = useState(null);
+  const [hover2, setHover2] = useState(null);
+  const [tempText, setTempText] = useState("");
   const [formData, setFormData] = useState({
     prof: [],
     quality: '',
@@ -28,7 +32,13 @@ export default function WriteReview() {
     day: '2-digit',
   });
 
-
+  const colorsAndWords= new Map([
+    [1, ["#00FF00", "Easy"]],//green
+    [2,["#DFFF00", "Not too bad"]],//greenish yellow
+    [3,["#ffc107", "Meh"]],
+    [4,["#ff7f7f", "Hard"]],
+    [5,["#FF5733", "Super hard"]],
+  ]);
   const { school, department, name } = useParams();
     
   const fetchCourse = useCallback(async () => {
@@ -103,6 +113,15 @@ export default function WriteReview() {
     }
 
   }
+  const handleMouseEnter = (diff) => {
+    setHover2(diff);
+    setTempText(colorsAndWords.get(diff)[1]);
+  }
+
+  const handleMouseLeave = () =>{
+    setHover2(null);
+    setTempText(null);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,13 +154,13 @@ export default function WriteReview() {
     <h2>Review for: {course.name}</h2>
     </div>
     </div>
-    <form id="loginForm" onSubmit={handleSubmit}>
+    <form id="reviewForm" onSubmit={handleSubmit}>
       <div className = "form-container">
       <div className = "input-section">
       <label> Professor: </label>
       <details>
         <summary> Choose one or many</summary>
-      <ul>
+      <ul id = "dropdown">
       {course.instructors.map((instructor, index) => (
             <li key = {index}> <label> <input type = "checkbox" name = "fc" value = {instructor.lastName} onChange={handleChange}/>{instructor.lastName}</label>
             </li>
@@ -151,6 +170,7 @@ export default function WriteReview() {
       </div>
       <div className = "input-section">
         <label htmlFor="quality"> Quality: </label>
+        <div className="shapes">
       {[...Array(5)].map((_, index) => {
     const givenRating = index + 1;
     return (
@@ -172,10 +192,34 @@ export default function WriteReview() {
       </label>
     );
   })}
+  </div>
       </div>
       <div className = "input-section">
       <label htmlFor="difficulty">Difficulty:</label>
-      <input type="number" id="difficulty" name="difficulty" value={formData.difficulty} onChange={handleChange}></input>
+      <div className="shapes">
+      {[...Array(5)].map((_, index) => {
+    const givenDifficulty = index + 1;
+    return (
+      <label className = "squares" key={index}>
+        <input
+          type="radio"
+          name="difficulty"
+          value={givenDifficulty}
+          checked={difficulty === givenDifficulty}
+          onChange={handleChange}
+          onClick={() => setDifficulty(givenDifficulty)}
+        />
+        <TbSquare
+          color = {givenDifficulty <= (hover2 || difficulty) ? colorsAndWords.get(givenDifficulty)[0]: "#e4e5e9"}
+          className="square"
+          onMouseEnter={() => handleMouseEnter(givenDifficulty)}
+          onMouseLeave={() => handleMouseLeave()}
+        />
+      </label>
+    );
+  })}
+   <p id = "tempText">{tempText}</p>
+  </div>
       </div>
       <div className = "input-section">
       <label htmlFor="hours">Hours Per Week:</label>
@@ -189,23 +233,15 @@ export default function WriteReview() {
       </div>
       <div className = "input-section">
       <label htmlFor="comment">Comment:</label>
-      <textarea id="comment" name="comment" rows="4" cols="50" value={formData.comment} onChange={handleChange}></textarea>
-      
-      <input type="submit"></input>
+      </div>
+      <div className="input-section">
+      <textarea id="comment" name="comment" rows="5" cols="60" value={formData.comment} onChange={handleChange}></textarea>
+      </div>
+      <div id = "submit">
+      <input className = "course-action-btn"type="submit"></input>
       </div>
       </div>
     </form>
     </>
   );
 }
-/* 
-<label for="prof">(hold shift to select multiple) Professor:</label>
-<select multiple name='prof' id='prof' value={formData.prof} onChange={handleChange}>
-        {course.instructors.map((instructor, index) => (
-            <option key={index} value={index}>
-                {instructor.lastName}
-            </option>
-        ))}
-      </select>
-   <input type="number" id="quality" name="quality" value={formData.quality} onChange={handleChange}></input>
-      </div>*/
