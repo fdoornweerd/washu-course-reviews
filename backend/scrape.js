@@ -2,19 +2,38 @@ const { Builder, By, Key, until } = require("selenium-webdriver");
 const { MongoClient } = require("mongodb");
 require('dotenv').config();
 
+// schools to scrape
+const SCHOOLS_ALLOWED = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
+const EXCLUDED_CLASSES = [
+    'Thesis Research',
+    'Degree Project',
+    'Workshops',
+    'Graduate Studio',
+    'Research',
+    'Research in Economics',
+    'Research in Economics (MA)',
+    'Physics I - Sophomores, Juniors, and Seniors Only',
+    'Masters Research',
+    'Doctoral Research',
+    'Undergraduate Honors Thesis',
+    'Masters Project',
+    `Thesis and Dissertation Research`,
+    'Master\'s Thesis',
+    `Dissertation Research`,
+    'RESEARCH'
+]
 
 
-async function getClasses(){
+
+
+async function getClasses(SEMESTERS_BACK){
     const driver = await new Builder().forBrowser('chrome').build();
 
     await driver.get('https://courses.wustl.edu/Semester/Listing.aspx');
 
-    // schools to scrape
-    const SCHOOLS_ALLOWED = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
 
 
     //select semester to update (0 is most recent option)
-    const SEMESTERS_BACK = 3;
     const adjusted = 2*SEMESTERS_BACK + 1;
 
     // click on semester to scrape
@@ -44,8 +63,10 @@ async function getClasses(){
     const numSchoolLinks = schoolLinks.length;
 
     const jsonData = [];
+    const departments = [];
 
-    for(let i=0; i<numSchoolLinks; i++){
+    for(let i=0; i<1; i++){
+        
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
         schoolLinks = await schoolContainer.findElements(By.css('a'));
@@ -57,6 +78,7 @@ async function getClasses(){
         if(!SCHOOLS_ALLOWED.includes(schoolName)){
             continue;
         }
+        departments.push([]);
 
         // click on school
         await currLinkS.click();
@@ -66,7 +88,7 @@ async function getClasses(){
         let deptContainer = await driver.findElement(By.xpath(departmentXPath));
         let deptLinks = await deptContainer.findElements(By.css('a'));
         const numDeptLinks = deptLinks.length;
-
+        
 
         for(let j=0; j<numDeptLinks; j++){
             // update so links dont become stale
@@ -77,6 +99,7 @@ async function getClasses(){
 
             const currLinkD = deptLinks[j];
             const deptName = await currLinkD.getText();
+            departments[departments.length-1].push(deptName);
 
             await driver.actions({ bridge: true }).move({ duration: 500, origin: currLinkD }).perform();
 
@@ -97,16 +120,16 @@ async function getClasses(){
                 //----------go through each class----------
                 const classXPath = '//*[@id="Body_oCourseList_viewSelect"]';
                 let classContainer = await driver.findElement(By.xpath(classXPath));
-                let classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
+                let classLinks = await classContainer.findElements(By.xpath('//*[@id="Body_oCourseList_tabSelect"]/div'));
                 const numClassLinks = classLinks.length;
 
-                const num = numClassLinks > 0 ? numClassLinks-1 : 0
+                const num = numClassLinks > 3 ? 3 : numClassLinks;
                 
-                for(let k=0; k<numClassLinks; k++){
+                for(let k=0; k<0; k++){
                     // update so links dont become stale
                     classContainer = await driver.findElement(By.xpath(classXPath));
-                    classLinks = await classContainer.findElements(By.css('div.CrsOpen'));
-            
+                    let classLinks = await classContainer.findElements(By.xpath('//*[@id="Body_oCourseList_tabSelect"]/div'));
+
                     // get current classLink
                     const currLinkC = classLinks[k];
 
@@ -115,6 +138,14 @@ async function getClasses(){
                     const classNameLink = await currLinkC.findElement(By.css('table > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > a'));
                     const codeName = await classCodeLink.getText();
                     const className = await classNameLink.getText();
+
+                    if(className == 'Physics I - First-Years Only'){
+                        className = 'Physics I';
+                    }
+
+                    if(EXCLUDED_CLASSES.includes(className)){
+                        continue;
+                    }
 
                     // get details for course
                     
@@ -198,8 +229,7 @@ async function getClasses(){
                         {
                             "code": [codeName],
                             "name": className,
-                            "department": deptName,
-                            "school": schoolName,
+                            "department": [deptName],
                             "instructors": instructorNames,
                             "courseDetails":courseDetails,
                             "lastOffered": semester,
@@ -214,7 +244,7 @@ async function getClasses(){
         }
     }
 
-    return [semester, jsonData];
+    return [semester, jsonData, departments];
 }
 
 
@@ -224,148 +254,179 @@ const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0
 const client = new MongoClient(uri);
 
 async function run() {
-  try {
-    const [semester,coursesData] = await getClasses();
+
+    const SEMESTERS_BACK = [3,4];
+
+    try {
+    for(const semesterBack of SEMESTERS_BACK){
+
+
+        const [semester,coursesData, departments] = await getClasses(semesterBack);
     
-    // insert courses into db
-    const database = client.db('RateMyCourse');
-    const courses = database.collection('courses');
-
-
-    // go through each course
-    for(const course of coursesData){
-        // get course from database with unqiue course code
-        const courseFilter = { name: course.name }
-        const existingCourse = await courses.findOne(courseFilter);
-
-
-
-
-        if(!existingCourse){
-            // if it doesnt exist insert it
-            const result = await courses.insertOne(course);
-            console.log(`Inserted course: ${course.department} - ${course.name}`);
-        } else{
-
-            // check if course code is different and add it to list
-            if(!existingCourse.code.includes(course.code[0])){
-                let updatedCodes = [...existingCourse.code,course.code[0]];
-                const update = {
-                    $set: { 
-                        code: updatedCodes,
-                        }
-                };
-                const updateResult = await courses.updateOne(courseFilter, update);
-
-                // log update
-                console.log(`Updated course codes for: ${course.department} - ${course.name} - ${course.code}`);
-            }
-
-
-
-
-
-            let addedSemester = false;
-
-            // check for instructors associated with the course who may have started teaching it
-           const instructorInDB = existingCourse.instructors;
-           const newInstructors = course.instructors.filter(el => {
-            // if instructor isnt in database return true
-            // no need to add a semester taught because it isnt present
-            if (!instructorInDB.some(dbEl => dbEl.lastName === el.lastName && dbEl.fullName === el.fullName)) {
-                return true;
-            } else {
-                // instructor is already in DB
-                const matchingInstructor = instructorInDB.find(dbEl => dbEl.fullName === el.fullName);
-                // check if instructor has already been added to have been teaching course
-                if(!matchingInstructor.semestersTaught.includes(semester)){
-                    // if not add new semester
-                    matchingInstructor.semestersTaught.push(semester);
-                    const idx = instructorInDB.findIndex(dbEl => dbEl.fullName === el.fullName);
-
-                    // add back to database
-                    instructorInDB[idx] = matchingInstructor;
-                    addedSemester = true;
-
+        // insert courses/departments into db
+        const database = client.db('RateMyCourse');
+    
+    
+    
+        // go through each department
+        const depts = database.collection('departments');
+        for(let i=0; i<departments.length; i++){
+            for(let j=0; j<departments[i].length; j++){
+                if(departments[i][j] == 'All Departments(All)'){
+                    continue;
                 }
-            
-                return false; 
+                const courseFilter = { school: SCHOOLS_ALLOWED[i], department: departments[i][j] }
+                const existingDept = await depts.findOne(courseFilter);
+    
+                if(!existingDept){
+                    const result = await depts.insertOne({school: SCHOOLS_ALLOWED[i], department:departments[i][j]});
+                    console.log(`Inserted department: ${departments[i][j]}`);
+                }
             }
-        });
-
-           let updatedInstructors = newInstructors.concat(instructorInDB);
-
-
-            let updatedInDB = "";
-            newInstructors.forEach(instructor => {
-                updatedInDB+=(instructor.lastName+" ");
+        }
+    
+    
+    
+    
+    
+        // go through each course
+        const courses = database.collection('courses');
+        for(const course of coursesData){
+            // get course from database with unqiue course code
+            const courseFilter = { name: course.name }
+            const existingCourse = await courses.findOne(courseFilter);
+    
+    
+    
+    
+            if(!existingCourse){
+                // if it doesnt exist insert it
+                const result = await courses.insertOne(course);
+                console.log(`Inserted course: ${course.department[0]} - ${course.name}`);
+            } else{
+    
+                // check if course code is different and add it to list and coresponding department
+                if(!existingCourse.code.includes(course.code[0])){
+                    let updatedCodes = [...existingCourse.code,course.code[0]];
+                    let updatedDepartments = [...existingCourse.department,course.department[0]];
+                    const update = {
+                        $set: { 
+                            code: updatedCodes,
+                            department: updatedDepartments
+                            }
+                    };
+                    const updateResult = await courses.updateOne(courseFilter, update);
+    
+                    // log update
+                    console.log(`Updated course codes for: ${course.department[0]} - ${course.name} - ${course.code}`);
+                }
+    
+    
+    
+    
+    
+                let addedSemester = false;
+    
+                // check for instructors associated with the course who may have started teaching it
+               const instructorInDB = existingCourse.instructors;
+               const newInstructors = course.instructors.filter(el => {
+                // if instructor isnt in database return true
+                // no need to add a semester taught because it isnt present
+                if (!instructorInDB.some(dbEl => dbEl.lastName === el.lastName && dbEl.fullName === el.fullName)) {
+                    return true;
+                } else {
+                    // instructor is already in DB
+                    const matchingInstructor = instructorInDB.find(dbEl => dbEl.fullName === el.fullName);
+                    // check if instructor has already been added to have been teaching course
+                    if(!matchingInstructor.semestersTaught.includes(semester)){
+                        // if not add new semester
+                        matchingInstructor.semestersTaught.push(semester);
+                        const idx = instructorInDB.findIndex(dbEl => dbEl.fullName === el.fullName);
+    
+                        // add back to database
+                        instructorInDB[idx] = matchingInstructor;
+                        addedSemester = true;
+    
+                    }
+                
+                    return false; 
+                }
             });
-            if(addedSemester){
-                updatedInDB+=semester;
-            }
-            if(updatedInDB!=""){
-                const update = {
-                    $set: { 
-                        instructors: updatedInstructors,
-                        }
-                };
-                const updateResult = await courses.updateOne(courseFilter, update);
-
-                // log update
-                console.log(`Updated course for: ${course.department} - ${course.name} - ${updatedInDB}`);
-            }
-            
-
-
-
-           //check if course was offered more recently
-           const semesterDB = existingCourse.lastOffered;
-           const semesterTypeDB = semesterDB.substring(0, 2); 
-           const yearDB = parseInt(semesterDB.substring(2));
-
-           const semesterIncoming = course.lastOffered;
-           const semesterTypeIncoming = semesterIncoming.substring(0, 2); 
-           const yearIncoming = parseInt(semesterIncoming.substring(2));
-           
-           if(yearIncoming > yearDB){
-            // more recent year
-                const update = {
-                    $set: {lastOffered: semesterIncoming}
+    
+               let updatedInstructors = newInstructors.concat(instructorInDB);
+    
+    
+                let updatedInDB = "";
+                newInstructors.forEach(instructor => {
+                    updatedInDB+=(instructor.lastName+" ");
+                });
+                if(addedSemester){
+                    updatedInDB+=semester;
                 }
-                const updateResult = await courses.updateOne(courseFilter, update);
-                console.log(`Updated most recently offered course for ${course.department} - ${course.name} - ${semesterIncoming}`);
-           } else if(yearIncoming == yearDB){
-                const semesterOrder = ["SP","SU","FL"];
-                if(semesterOrder.indexOf(semesterTypeDB) < semesterOrder.indexOf(semesterTypeIncoming)){
-                    // more recent semester
+                if(updatedInDB!=""){
+                    const update = {
+                        $set: { 
+                            instructors: updatedInstructors,
+                            }
+                    };
+                    const updateResult = await courses.updateOne(courseFilter, update);
+    
+                    // log update
+                    console.log(`Updated course for: ${course.department[0]} - ${course.name} - ${updatedInDB}`);
+                }
+                
+    
+    
+    
+               //check if course was offered more recently
+               const semesterDB = existingCourse.lastOffered;
+               const semesterTypeDB = semesterDB.substring(0, 2); 
+               const yearDB = parseInt(semesterDB.substring(2));
+    
+               const semesterIncoming = course.lastOffered;
+               const semesterTypeIncoming = semesterIncoming.substring(0, 2); 
+               const yearIncoming = parseInt(semesterIncoming.substring(2));
+               
+               if(yearIncoming > yearDB){
+                // more recent year
                     const update = {
                         $set: {lastOffered: semesterIncoming}
                     }
                     const updateResult = await courses.updateOne(courseFilter, update);
-                    console.log(`Updated most recently offered course for ${course.department} - ${course.name} - ${semesterIncoming}`);
-                }
-           }
-
-
-
-           // check for updated course description
-
-           if(course.courseDetails != existingCourse.courseDetails){
-                const update = {
-                    $set: {courseDetails: course.courseDetails}
-                }
-                const updateResult = await courses.updateOne(courseFilter, update);
-                console.log(`Updated course description for ${course.department} - ${course.name}`);
-           }
-           
+                    console.log(`Updated most recently offered course for ${course.department[0]} - ${course.name} - ${semesterIncoming}`);
+               } else if(yearIncoming == yearDB){
+                    const semesterOrder = ["SP","SU","FL"];
+                    if(semesterOrder.indexOf(semesterTypeDB) < semesterOrder.indexOf(semesterTypeIncoming)){
+                        // more recent semester
+                        const update = {
+                            $set: {lastOffered: semesterIncoming}
+                        }
+                        const updateResult = await courses.updateOne(courseFilter, update);
+                        console.log(`Updated most recently offered course for ${course.department[0]} - ${course.name} - ${semesterIncoming}`);
+                    }
+               }
+    
+    
+    
+               // check for updated course description
+    
+               if(course.courseDetails != existingCourse.courseDetails){
+                    const update = {
+                        $set: {courseDetails: course.courseDetails}
+                    }
+                    const updateResult = await courses.updateOne(courseFilter, update);
+                    console.log(`Updated course description for ${course.department[0]} - ${course.name}`);
+               }
+               
+            }
         }
     }
 
 
-  } finally {
-    await client.close();
+    } finally {
+        await client.close();
 
-  }
+    }
 }
 
 

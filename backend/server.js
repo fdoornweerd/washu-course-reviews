@@ -50,9 +50,8 @@ app.post('/getDepartments', async (req, res) => {
 
 app.post('/getCourses', async (req, res) => {
     try {
-        const school = req.body.school;
         const department = req.body.department;
-        const courses = await getCourses(school,department);
+        const courses = await getCourses(department);
         res.json(courses);
     } catch (error) {
         console.error("Error fetching courses:", error);
@@ -62,10 +61,8 @@ app.post('/getCourses', async (req, res) => {
 
 app.post('/getCourse', async (req, res) => {
     try {
-        const school = req.body.school;
-        const department = req.body.department;
         const name = req.body.name;
-        const courses = await getCourse(school,department, name);
+        const courses = await getCourse(name);
         res.json(courses);
     } catch (error) {
         console.error("Error fetching courses:", error);

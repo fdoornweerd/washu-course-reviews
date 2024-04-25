@@ -106,3 +106,23 @@ li > label:has(input:checked) {
     cursor: not-allowed;   
     border: 1px solid #999;
 }
+
+
+.textarea {
+    width: 100%; 
+    height: 100%; 
+    background-color: white;
+    border: 0.1em solid #474747;
+    border-radius:2%;
+    padding: 0.5em;
+    font-size: 1em;
+    line-height: 1.5;
+    resize: none; 
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); 
+}
+
+.textarea:focus {
+    outline: none; 
+    border-color: #C0CCA4;
+    box-shadow: 0 0 5px #e8f6c7; 
+}

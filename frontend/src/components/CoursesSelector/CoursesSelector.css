@@ -111,9 +111,10 @@ background-color: #2E6939;;
    text-align: left;
     color: #2E6939;
     font-size: large;
+    background-color: transparent;
     font-weight: bold;
     border: none;
 }
-.course-btn:hover{
-    background-color: rgb(218, 215, 215);
+.course-preview:hover{
+    background-color: rgb(230, 230, 230);
 }

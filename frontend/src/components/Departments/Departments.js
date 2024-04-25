@@ -1,18 +1,18 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ReactLoading from "react-loading";
-import "./Departments.css"
+import "./Departments.css";
 
-export default function Departments({ school}) {
+export default function Departments({ school }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
+  const [departments, setDepartments] = useState([]);
 
-
-  const [departments, setDepartments] = useState([])
-  useEffect(() =>{
+  useEffect(() => {
     const fetchDepartments = async () => {
-      setIsLoading(true);
+      setIsLoading(true); // Start loading
       try {
         const response = await fetch("http://localhost:3456/getDepartments", {
           method: "POST",
@@ -26,36 +26,34 @@ export default function Departments({ school}) {
       } catch (error) {
         console.error("Error fetching departments:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // End loading
       }
     };
+
     fetchDepartments();
+  }, [school]); // Dependency array includes school, refetch if school changes
 
+  const deptClick = (school, dept) => {
+    sessionStorage.setItem('prevPath', location.pathname);
+    navigate(`/${dept}`);
+  };
 
-  }, [school]);
-
-
-    const deptClick = (school,dept) => {
-      navigate(`/${school}/${dept}`);
-    };
-  
-    if (isLoading) {
-      return(
-        <div className ="loadingScreen">
-        <ReactLoading type="spokes" color="#D33C41"
-      height={100} width={50} />
-      </div>
-      )  
-    }
-
-  return(
-   <div className = "body-container">
-      <h2> {school} Departments:</h2>
-      <div className = "depts">
-        {departments.map((dept) => (
-            <button className = "dept-btn" key={dept} onClick={ () => deptClick(school,dept)}>{dept}</button>
-        ))}
-    </div>
+  return (
+    <div className="body-container">
+      <h2>{school} Departments:</h2>
+      {isLoading ? (
+        <div className="loadingScreen">
+          <ReactLoading type="bars" color="#606E52" height={160} width={80} />
+        </div>
+      ) : (
+        <div className="depts">
+          {departments.map((dept) => (
+            <button className="dept-btn" key={dept} onClick={() => deptClick(school, dept)}>
+              {dept}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

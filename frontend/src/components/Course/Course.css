@@ -26,7 +26,16 @@
       max-height: 0em;
     }
   }
-  
+
+h2{
+    margin-bottom: 0;
+}
+h5 {
+    color: grey; /* Sets the text color to grey */
+    margin-top: 0em; /* Minimal space above the h5 */
+    margin-bottom: 2em; /* Minimal space below the h5 */
+    font-size: 1em; /* Adjust font size as needed */
+}
 
 #write-review-btn{
     width:12em;
@@ -49,6 +58,7 @@
 .professor-container{
     display: flex;
     justify-content: left;
+    color: gray;
     font-weight: bold;
 }
 .detail{
@@ -168,4 +178,24 @@ background-color: #2E6939;;
     right:0em;
     font-size: 2em;
     ;
+}
+#hours-container {
+    display: flex;
+    justify-content: left;
+    padding-left: 1em;
+    color: gray;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+#RMP-btn{
+    background-color:#606E52 ;
+    margin-left: 2em;
+    width:15em;
+    height: 3em;
+    border-radius: 5%;
+    border: none;
+    color:white;
+}
+#RMP-btn:hover{
+    background-color: #7a8c68;
 }

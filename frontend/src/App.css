@@ -12,19 +12,6 @@ body{
 }
 
 
-.header-with-image {
-  display: flex;          
-  justify-content: center; /* This centers the flex items horizontally in the container */
-  align-items: center;     /* This centers the flex items vertically in the container */
-  width: 100%;  
-}
-
-.smaller-image {
-  width: calc(100% / 18);  
-  height: auto;      
-}
-
-
 /*
 dark grey:#474747
 light grey: #8F8B84

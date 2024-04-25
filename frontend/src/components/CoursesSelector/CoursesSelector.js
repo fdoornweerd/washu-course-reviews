@@ -8,7 +8,7 @@ export default function CoursesSelector(){
     const [courses, setCourses] = useState([])
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(true)
-    const { school, department } = useParams();
+    const { department } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -18,8 +18,8 @@ export default function CoursesSelector(){
       (course.instructors && course.instructors.some(instructor => instructor.fullName.toLowerCase().includes(inputValue.toLowerCase())))
   );
 
-  const colors = ["#D3D3D3","#E96347","#ff7f7f","#fce803","#DFFF00","#85F485"];//grey, red, yellow, green
-  const difficultColors= ["D3D3D3","#85F485","#DFFF00","#fce803","#ff7f7f","#E96347"];
+  const colors = ["#D3D3D3","#DD3730","#FF9500","#FFCD00","#9ED10F","#3BA500"];//grey, red, yellow, green
+  const difficultColors= ["D3D3D3","#3BA500","#9ED10F","#FFCD00","#FF9500","#DD3730"];
 
     //async function fetchCourses(){
       const fetchCourses = useCallback(async () => {
@@ -30,7 +30,7 @@ export default function CoursesSelector(){
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({school: school === undefined ? 'all' :school, department: department === undefined ? 'all' : department}),
+            body: JSON.stringify({department: department === undefined ? 'all' : department}),
           });
           const data = await response.json();
           setCourses(data);
@@ -41,24 +41,17 @@ export default function CoursesSelector(){
         }
 
 
-      }, [school, department]);
+      }, [department]);
 
     useEffect(() => {
       fetchCourses();
-    }, [fetchCourses, school, department]);
+    }, [fetchCourses, department]);
 
 
-    if (isLoading) {
-      return(
-        <div className ="loadingScreen">
-        <ReactLoading type="spokes" color="#D33C41"
-      height={100} width={50} />
-      </div>
-      )  
-    }
 
-      const courseClick = (schoolNav,deptNav,nameNav) => {
-        navigate(`/${schoolNav}/${deptNav}/${nameNav}`);
+      const courseClick = (deptNav,nameNav) => {
+        sessionStorage.setItem('prevPath', location.pathname);
+        navigate(`/${deptNav}/${nameNav}`);
       };
 
       const inputChange = (event) => {
@@ -73,7 +66,7 @@ export default function CoursesSelector(){
               <button className = "back-btn" onClick={() => {navigate(`/`);}}>Back</button>
               </div> 
               <div className="title-container">
-              <h2>{department == undefined ? 'Courses' : `Courses for ${department}`}</h2>
+              <h2>{department === (undefined || 'all') ? 'All Courses' : `Courses for ${department}`}</h2>
               </div>
             </div>
         <div className = "search-bar">
@@ -85,24 +78,32 @@ export default function CoursesSelector(){
           onChange={inputChange}
       />
       </div>
+
+      {isLoading &&    
+        <div className ="loadingScreen">
+          <ReactLoading type="bars" color="#606E52"
+        height={160} width={80} />
+        </div>
+      }
+
       <div className="course-buttons">
       {filteredCourses.map((course) => (
-            <li key = {course.id}>
-              <div className = "course-preview">
+            <li key={course.id} >
+              <div className = "course-preview" onClick={ () => courseClick(course.department,course.name)}>
                 <div className = "rating-container">
                   <p className = "rating-label">Quality:</p>
-                  <div className = "rating-box" style={{backgroundColor: colors[Math.floor(course.avgQuality)]}}>
+                  <div className = "rating-box" style={{backgroundColor: colors[Math.round(course.avgQuality)]}}>
                     <p className = "rating-box-num">{course.avgQuality >0 ? course.avgQuality.toFixed(1) : 'N/A'}</p>
                   </div>
                 </div>
                 <div className = "rating-container">
                   <p className = "rating-label">Difficulty:</p>
-                  <div className = "rating-box" style={{backgroundColor: (course.avgDifficulty==0 ? "#D3D3D3" : difficultColors[Math.round((course.avgDifficulty))])}}>
+                  <div className = "rating-box" style={{backgroundColor: (course.avgDifficulty===0 ? "#D3D3D3" : difficultColors[Math.round((course.avgDifficulty))])}}>
                     <p className = "rating-box-num">{course.avgDifficulty >0 ? course.avgDifficulty.toFixed(1) : 'N/A'}</p>
                   </div>
                 </div>
                 <div id = "rest-of-li">
-              <button className ="course-btn" key={course.id} onClick={ () => courseClick(course.school,course.department,course.name)}>{course.name}</button>
+              <button className ="course-btn">{course.name}</button>
               </div>
               </div>
               

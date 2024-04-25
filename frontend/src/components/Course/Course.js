@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useCallback } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ReactLoading from "react-loading";
 import "./Course.css";
 
@@ -10,11 +10,10 @@ export default function Course(){
     const [isAnimated, setIsAnimated] = useState(false);
     const [selectedProfessor, setSelectedProfessor] = useState(['','',''])
     const navigate = useNavigate();
-    const location = useLocation();
 
-    const { school, department, name } = useParams();
-    const colors = ["#D3D3D3","#E96347","#ff7f7f","#fce803","#DFFF00","#85F485"];
-    const difficultColors= ["#85F485","#DFFF00","#fce803","#ff7f7f","#E96347"]; //green, green yellow, yellow, light red, dark red
+    const { department, name } = useParams();
+    const colors = ["#D3D3D3","#DD3730","#FF9500","#FFCD00","#9ED10F","#3BA500"];
+    const difficultColors= ["#3BA500","#9ED10F","#FFCD00","#FF9500","#DD3730"]; //green, green yellow, yellow, light red, dark red
     const fetchCourse = useCallback(async () => {
         try {
             setIsLoading(true);
@@ -23,7 +22,7 @@ export default function Course(){
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({school: school, department: department, name: name}),
+            body: JSON.stringify({name: name}),
           });
           const data = await response.json();
           setCourse(data);
@@ -32,11 +31,11 @@ export default function Course(){
         } finally {
             setIsLoading(false);
         }
-      }, [school, department,name]);
+      }, [name]);
 
       useEffect(() => {
         fetchCourse();
-      }, [fetchCourse, school, department,name]);
+      }, [fetchCourse, name]);
       
       const animatedStyle = {animation: "inAnimation 400ms ease-in"};
       const unanimatedStyle = {
@@ -55,8 +54,8 @@ export default function Course(){
       window.open(`https://www.ratemyprofessors.com/search/professors/1147?q=${nameSearch}`, '_blank', 'noopener,noreferrer');
     }
     
-    const writeReview = (schoolNav,deptNav,nameNav) => {
-      navigate(`/${schoolNav}/${deptNav}/${nameNav}/review`);
+    const writeReview = (deptNav,nameNav) => {
+      navigate(`/${deptNav}/${nameNav}/review`);
     }
 
     const selectNewProfessor = (event) => {
@@ -65,9 +64,10 @@ export default function Course(){
       let fullName;
       let semestersTaught;
       if(idx !== 'All Professors'){
-        lastName = course.instructors[idx].lastName;
-        fullName = course.instructors[idx].fullName;
-        semestersTaught = course.instructors[idx].semestersTaught;
+        const sortedInstructors = course.instructors.sort((a, b) => a.lastName.localeCompare(b.lastName));
+        lastName = sortedInstructors[idx].lastName;
+        fullName = sortedInstructors[idx].fullName;
+        semestersTaught = sortedInstructors[idx].semestersTaught;
       } else{
         lastName = '';
         fullName = '';
@@ -77,32 +77,49 @@ export default function Course(){
 
     }
 
+    const handleBack = () => {
+      if(sessionStorage.getItem('prevPath') == null){
+        navigate(`/${department}`);
+      } else{
+        navigate(sessionStorage.getItem('prevPath'));
+      }
+
+    }
+
     if (isLoading) {
       return(
-        <div className ="loadingScreen">
-        <ReactLoading type="spokes" color="#D33C41"
-      height={100} width={50} />
+        <>
+        <div className = "top-bar">
+        <div className="btn-container">
+        <button className = "back-btn" onClick={handleBack}>Back</button>
+        </div> 
+        <div className="title-container">
+        <h2>{course.name}</h2>
+        </div>
       </div>
+        <div className ="loadingScreen">
+          <ReactLoading type="bars" color="#606E52"
+        height={160} width={80} />
+        </div>
+        </>
       )  
     }
 
-    const handleBack = () => {
 
-      navigate(`/${location.pathname.split('/')[1]}/${location.pathname.split('/')[2]}`)
-
-    }
       
 
     return (
-        <div className="course-body">
+      <div className="course-body">
            <div className = "top-bar">
               <div className="btn-container">
               <button className = "back-btn" onClick={handleBack}>Back</button>
               </div> 
               <div className="title-container">
               <h2>{course.name}</h2>
+              <h5>{course.code.map((code, index) => code).join(', ')}</h5>
               </div>
             </div>
+
         <div className = "detail">
           <button id = "description-btn"onClick={() => {
             setIsAnimated(!isAnimated)
@@ -115,6 +132,9 @@ export default function Course(){
         </div>
             </div>}
         </div>
+
+
+
         <div className="content-container">
         <div id = "before-reviews">
         <div className="review-top-bar">
@@ -125,34 +145,39 @@ export default function Course(){
           <label htmlFor="professor-select">Select Professor:</label>
           <select id = "professor-select" onChange={selectNewProfessor}>
             <option key={-1} value="All Professors">All Professors</option>
-            {course.instructors.map((instructor, index) => (
-              <option key = {index} value = {index}>
-                {instructor.lastName}
-              </option>
-            ))}
+            {
+              [...course.instructors]
+              .sort((a, b) => a.lastName.localeCompare(b.lastName))
+              .map((instructor, index) => (
+                <option key={index} value={index}>
+                  {instructor.lastName}
+                </option>
+              ))
+            }
           </select>
         </div>
         </div>
-          <div>
-          {selectedProfessor[0] !== '' && <button onClick={openRateMyProfessor}>Search RateMyProfessor For {selectedProfessor[1]}</button>}
-        </div>
-        <div>
-          {selectedProfessor[2] !== '' && 
-            <>
-            <p className = "small">Semesters Taught In The Past:</p>
-            {selectedProfessor[2].map((semester, index) => (
-                <li className = "small" key = {index} >{semester}</li>
-              ))}
-            </>
-          }
-        </div>
+
         </div>
         <div className="review-btn-container">
-          <button id = "write-review-btn" onClick={() => writeReview(school, department, name)}><span>Write a Review</span></button>
+          <button id = "write-review-btn" onClick={() => writeReview(department, name)}><span>Write a Review</span></button>
         </div>
-          {course.reviews.map((review) => (
+        </div>
+
+        
+        {selectedProfessor[2] !== '' && 
+            <p className = "small">Semesters Taught In The Past: {selectedProfessor[2].map((semester, index) => semester).join(', ')}</p>
+          }
+          <div>
+          {selectedProfessor[0] !== '' && <button id='RMP-btn' onClick={openRateMyProfessor}>Search RateMyProfessor</button>}
+        </div>
+        <div>
+
+
+
+          {course.reviews.map((review,index) => (
             (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[0])) && ( 
-            <div className = "review">
+            <div key={index} className = "review">
                <div className = "rating-container">
                   <p className = "rating-label">Quality:</p>
                   <div className = "rating-box" style={{backgroundColor: colors[Math.floor(review.quality)]}}>
@@ -168,10 +193,15 @@ export default function Course(){
                 <div className = "review-stack">
                <div className="professor-and-date">
               <div className = "professor-container">
-              <p>{review.instructor.length === 1 ? 'Professor' : 'Professors'}: {review.instructor.map((instructor,index) => (
-                  <li key = {index} style={{ cursor: 'pointer' }} onClick={() => openRateMyProfessor(instructor)}>{instructor}</li>
+              <p>{review.instructor.length === 0 ? '' : (review.instructor.length === 1 ? 'Professor:' : 'Professors:')} {review.instructor.map((instructor,index) => (
+                  <li key = {index}>{instructor}</li>
               ))}</p>
               </div>
+
+              <div id='hours-container'>
+                <p>Hours per week outside of course: {review.hours}</p>
+              </div>
+
               <div id = "date">
                 <p>{review.date}</p>
               </div>

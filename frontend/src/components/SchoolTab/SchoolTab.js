@@ -1,20 +1,22 @@
 import React from "react";
-import Departments from "../Departments/Departments";
 import "./SchoolTab.css";
 
+export default function SchoolTab({ schoolName, activeSchool, setActiveSchool }) {
+  const chooseSchool = () => {
+    sessionStorage.setItem('selectedSchool',schoolName);
+    setActiveSchool(schoolName);
+  };
 
-export default function SchoolTab({ schoolName, activeSchool, setActiveSchool}) {
-
-
-
-const chooseSchool = () => {
-  setActiveSchool(schoolName)
-}
+  const isActive = schoolName === activeSchool;
 
   return (
-    //check if school is active dept
-    <div className = "main-body">
-    <button className = "school-btn"onClick={chooseSchool}>{schoolName}</button>
+    <div className="main-body">
+      <button
+        className={`school-btn ${isActive ? "active" : ""}`}
+        onClick={chooseSchool}
+      >
+        {schoolName}
+      </button>
     </div>
-  )
+  );
 }

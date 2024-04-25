@@ -6,7 +6,6 @@ import Course from './components/Course/Course';
 import WriteReview from './components/Review/WriteReview';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
-import picture from './picture.png';
 
 function App() {
   const schools = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
@@ -17,9 +16,8 @@ function App() {
         <Routes>
           <Route path="/" element={
               <div className="App">
-                    <div className="title header-with-image">
+                    <div className="title">
                       <h1>WashU Course Reviews</h1>
-                      <img src={picture} className="smaller-image" alt="Course Review"></img>
                     </div>
                 <div className="tabs">
                   <Tabs schools={schools}/> 
@@ -28,16 +26,16 @@ function App() {
               </div>
             } />
 
-          <Route path="/:school/:department" element={
+          <Route path="/:department" element={
             <CoursesSelector/>
           } />
 
 
-          <Route path="/:school/:department/:name" element={
+          <Route path="/:department/:name" element={
             <Course/>
           } />    
 
-          <Route path="/:school/:department/:name/review" element={
+          <Route path="/:department/:name/review" element={
             <WriteReview/>
           } />    
 

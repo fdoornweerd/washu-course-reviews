@@ -35,13 +35,13 @@ export default function WriteReview() {
   });
 
   const colorsAndWords= new Map([
-    [1, ["#00FF00", "Easy"]],//green
-    [2,["#DFFF00", "Not too bad"]],//greenish yellow
-    [3,["#ffc107", "Meh"]],
-    [4,["#ff7f7f", "Hard"]],
-    [5,["#FF5733", "Super hard"]],
+    [1, ["#3BA500", "Easy"]],//green
+    [2,["#9ED10F", "Not too bad"]],//greenish yellow
+    [3,["#FFCD00", "OK"]],
+    [4,["#FF9500", "Hard"]],
+    [5,["#DD3730", "Super hard"]],
   ]);
-  const { school, department, name } = useParams();
+  const { department, name } = useParams();
     
   const fetchCourse = useCallback(async () => {
       try {
@@ -51,7 +51,7 @@ export default function WriteReview() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({school: school, department: department, name: name}),
+          body: JSON.stringify({name: name}),
         });
         const data = await response.json();
         setCourse(data);
@@ -64,11 +64,11 @@ export default function WriteReview() {
       } finally {
           setIsLoading(false);
       }
-    }, [school, department,name]);
+    }, [department,name]);
 
     useEffect(() => {
         fetchCourse();
-    }, [fetchCourse, school, department,name]);
+    }, [fetchCourse, department,name]);
 
 
 
@@ -97,6 +97,7 @@ export default function WriteReview() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (name === 'prof') {
       setFormData(prevState => {
         const newProfs = [...prevState.prof];
@@ -144,22 +145,33 @@ export default function WriteReview() {
       hours: '',
       comment: '',
     });
-    navigate(`/${school}/${department}/${name}`);
+    navigate(`/${department}/${name}`);
   };
 
   if (isLoading) {
     return(
-      <div className ="loadingScreen">
-      <ReactLoading type="spokes" color="#D33C41"
-    height={100} width={50} />
+      <>
+      <div className = "top-bar">
+      <div className="btn-container">
+      <button className = "back-btn" onClick={() => navigate(`/${department}/${name}`)}>Back</button>
+      </div> 
+      <div className="title-container">
+      <h2>{course.name}</h2>
+      </div>
     </div>
+      <div className ="loadingScreen">
+        <ReactLoading type="bars" color="#606E52"
+      height={160} width={80} />
+      </div>
+      </>
     )  
   }
+  
   return (
     <>
     <div className = "top-bar">
     <div className="btn-container">
-    <button className = "back-btn" onClick={() => navigate(-1)}>Back</button>
+    <button className = "back-btn" onClick={() => navigate(`/${department}/${name}`)}>Back</button>
     </div> 
     <div className="title-container">
     <h2>Review for: {course.name}</h2>
@@ -172,7 +184,9 @@ export default function WriteReview() {
       <details>
         <summary> Choose one or many</summary>
       <ul id = "dropdown">
-      {course.instructors.map((instructor, index) => (
+      {[...course.instructors]
+       .sort((a, b) => a.lastName.localeCompare(b.lastName))
+       .map((instructor, index) => (
             <li key = {index}> <label> <input type = "checkbox" name = "prof" value = {instructor.lastName} onChange={handleChange}/>{instructor.lastName}</label>
             </li>
       ))}
@@ -233,7 +247,7 @@ export default function WriteReview() {
   </div>
       </div>
       <div className = "input-section">
-      <label htmlFor="hours">Hours Per Week:</label>
+      <label htmlFor="hours">Hours/week outside of course:</label>
       <select name='hours' id='hours' value={formData.hours} onChange={handleChange}>
         {hourOptions.map((time, index) => (
             <option key = {index} value = {time}>
@@ -246,7 +260,7 @@ export default function WriteReview() {
       <label htmlFor="comment">Comment:</label>
       </div>
       <div className="input-section">
-      <textarea id="comment" name="comment" rows="5" cols="60" value={formData.comment} onChange={handleChange}></textarea>
+      <textarea className="textarea" id="comment" name="comment" rows="5" cols="60" maxlength="4000" value={formData.comment} onChange={handleChange}></textarea>
       </div>
       <div id = "submit">
       <input className = "course-action-btn" type="submit" disabled={formData.quality === '' || formData.difficulty === '' || formSubmitted}></input>

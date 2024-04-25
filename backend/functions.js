@@ -28,12 +28,12 @@ async function getDepartments(school){
 
     const client = new MongoClient(uri);
     const database = client.db('RateMyCourse');
-    const courses = database.collection('courses');
+    const depts = database.collection('departments');
 
     try{
-        const filter = {school: school};
-        return await courses.distinct('department',filter);
-    
+
+        return await depts.distinct("department",{school:school});
+
     } catch (err){
         console.error('Error fetching departments:', err);
         return [];
@@ -44,7 +44,8 @@ async function getDepartments(school){
 
 // returns all courses in a department
 // make the department 'all' to get all courses
-async function getCourses(school, department){
+async function getCourses(department){
+
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -55,7 +56,7 @@ async function getCourses(school, department){
         if(department == 'all'){
             return await courses.find().sort({ numScores: -1 }).toArray();
         } else{
-            return await courses.find({department: department, school: school}).sort({ numScores: -1 }).toArray();
+            return await courses.find({department: department}).sort({ numScores: -1 }).toArray();
         }
         
     
@@ -67,7 +68,7 @@ async function getCourses(school, department){
     }
 }
 
-async function getCourse(school, department, name){
+async function getCourse(name){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
     const client = new MongoClient(uri);
@@ -75,7 +76,7 @@ async function getCourse(school, department, name){
     const courses = database.collection('courses');
 
     try{
-        return await courses.findOne({department: department, school: school, name: name});
+        return await courses.findOne({name: name});
     
     } catch (err){
         console.error('Error fetching course:', err);
@@ -85,62 +86,9 @@ async function getCourse(school, department, name){
     }
 }
 
-// searches courses for either the name of the course or course code
-// if searching all classes, put department as 'all'
-async function searchCourses(department, searchTerm){
-    const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-    const client = new MongoClient(uri);
-    const database = client.db('RateMyCourse');
-    const courses = database.collection('courses');
-
-    try{
-        const regex = new RegExp(searchTerm, 'i');
-        
-
-        if(department == 'all'){
-            const results = await courses.find({
-                $or: [
-                    { name: {$regex: regex}},
-                    { code: {$regex: regex}},
-                    { "instructors.fullName": { $regex: regex } }
-                ]
-            }).toArray();
-
-            return results;
-        } else{
-            const results = await courses.find({
-                $or: [
-                    { name: { $regex: regex } },
-                    { code: { $regex: regex } },
-                    { "instructors.fullName": { $regex: regex } }
-                ],
-                department: department
-            }).toArray();
-
-            return results;
-        }
-    } catch (err){
-        console.error('Error searching:', err);
-        return [];
-    } finally {
-        await client.close();
-    }
-}
 
 
 
-function getProfessorLink(fullName){
-    const nameParts = fullName.split(' ');
-    const firstName = nameParts[0];
-    const lastName = nameParts[1];
-    return `https://www.ratemyprofessors.com/search/professors/1147?q=${firstName}%20${lastName}`;
-}
-
-
-
-// TODO: figure out how to grab dateposted and how to track userID so they cant comment a lot (once per session or something?)
-// quality (num 1-5) difficulty (num 1-5 ) instructor (array of last names) grade (letter grade)
 async function insertReview(quality, difficulty, instructor, hours, comment, datePosted, courseName){
     const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -217,8 +165,6 @@ module.exports = {
     getDepartments,
     getCourses,
     getCourse,
-    searchCourses,
-    getProfessorLink,
     insertReview,
     fetchReviews,
 };
