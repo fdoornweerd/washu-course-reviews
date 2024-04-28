@@ -126,3 +126,20 @@ li > label:has(input:checked) {
     border-color: #C0CCA4;
     box-shadow: 0 0 5px #e8f6c7; 
 }
+.select-input {
+    background-color: #E5DED6;
+    border: none;
+    border-radius: 5px;
+    color: black;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 11.2em;
+    padding: 0.4em 0.8em;
+    line-height: 1.2;
+    height: auto;
+}
+
+.select-input:hover {
+    background-color: #D1CAB8;
+}

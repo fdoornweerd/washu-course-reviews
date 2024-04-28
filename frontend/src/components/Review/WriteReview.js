@@ -46,7 +46,7 @@ export default function WriteReview() {
   const fetchCourse = useCallback(async () => {
       try {
           setIsLoading(true);
-        const response = await fetch("http://localhost:3456/getCourse", {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getCourse`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export default function WriteReview() {
 
     const insertReview = async () => {
       try {
-        const response = await fetch("http://localhost:3456/insertReview", {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/insertReview`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -248,7 +248,7 @@ export default function WriteReview() {
       </div>
       <div className = "input-section">
       <label htmlFor="hours">Hours/week outside of course:</label>
-      <select name='hours' id='hours' value={formData.hours} onChange={handleChange}>
+      <select class='select-input' name='hours' id='hours' value={formData.hours} onChange={handleChange}>
         {hourOptions.map((time, index) => (
             <option key = {index} value = {time}>
                 {time}

@@ -17,7 +17,7 @@ export default function Course(){
     const fetchCourse = useCallback(async () => {
         try {
             setIsLoading(true);
-          const response = await fetch("http://localhost:3456/getCourse", {
+          const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getCourse`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -135,46 +135,46 @@ export default function Course(){
 
 
 
-        <div className="content-container">
-        <div id = "before-reviews">
-        <div className="review-top-bar">
-        <div>
-          <h3>Reviews For {selectedProfessor[0] === '' ? 'All Professors' : selectedProfessor[0]}</h3>
-          </div>
-          <div className="content-and-btn">
-          <label htmlFor="professor-select">Select Professor:</label>
-          <select id = "professor-select" onChange={selectNewProfessor}>
-            <option key={-1} value="All Professors">All Professors</option>
-            {
-              [...course.instructors]
-              .sort((a, b) => a.lastName.localeCompare(b.lastName))
-              .map((instructor, index) => (
-                <option key={index} value={index}>
-                  {instructor.lastName}
-                </option>
-              ))
-            }
-          </select>
-        </div>
-        </div>
+  <div className="content-container">
+  <div id="before-reviews">
+    <div className="review-top-bar">
+      <div>
+        <h3>Reviews For {selectedProfessor[0] === '' ? 'All Professors' : selectedProfessor[0]}</h3>
+      </div>
+      <div className="content-and-btn">
+        <label htmlFor="professor-select">Select Professor:</label>
+        <select class='select-input' id="professor-select" onChange={selectNewProfessor}>
+          <option key={-1} value="All Professors">All Professors</option>
+          {[...course.instructors].sort((a, b) => a.lastName.localeCompare(b.lastName)).map((instructor, index) => (
+            <option key={index} value={index}>{instructor.lastName}</option>
+          ))}
+        </select>
+      </div>
+    </div>
 
-        </div>
-        <div className="review-btn-container">
-          <button id = "write-review-btn" onClick={() => writeReview(department, name)}><span>Write a Review</span></button>
-        </div>
-        </div>
-
-        
+    <div className="review-btn-container">
+      <div className="left-btns">
+      {selectedProfessor[0] !== '' && 
+          <button id="RMP-btn" onClick={openRateMyProfessor}>Search RateMyProfessor</button>
+        }
         {selectedProfessor[2] !== '' && 
-            <p className = "small">Semesters Taught In The Past: {selectedProfessor[2].map((semester, index) => semester).join(', ')}</p>
-          }
-          <div>
-          {selectedProfessor[0] !== '' && <button id='RMP-btn' onClick={openRateMyProfessor}>Search RateMyProfessor</button>}
-        </div>
+          <p className="small">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Semesters Taught In The Past: {selectedProfessor[2].map((semester, index) => semester).join(', ')}</p>
+        }
+      </div>
+      <div className="right-btn">
+        <button id="write-review-btn" onClick={() => writeReview(department, name)}><span>Write a Review</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
         <div>
-
-
-
           {course.reviews.map((review,index) => (
             (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[0])) && ( 
             <div key={index} className = "review">

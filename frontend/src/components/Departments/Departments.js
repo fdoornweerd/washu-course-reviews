@@ -14,7 +14,7 @@ export default function Departments({ school }) {
     const fetchDepartments = async () => {
       setIsLoading(true); // Start loading
       try {
-        const response = await fetch("http://localhost:3456/getDepartments", {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getDepartments`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

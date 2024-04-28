@@ -131,7 +131,7 @@ label{
     margin:2em 2em 2em 0em;
     width:100%;
     display:flex;
-    justify-content: right;
+    justify-content: space-between;
 }
 .course-action-btn{
     background-color: #1B4726;
@@ -155,7 +155,7 @@ background-color: #2E6939;;
     padding:1em;
     cursor: pointer;
     transition: all 0.5s;
-    box-shadow: 0 .5em 1em -.5em rgba(0, 0, 0,.7);
+    /* box-shadow: 0 .5em 1em -.5em rgba(0, 0, 0,.7); */
     display: inline-block;
     position:relative;
     font-size: 1.1em;
@@ -190,8 +190,8 @@ background-color: #2E6939;;
 #RMP-btn{
     background-color:#606E52 ;
     margin-left: 2em;
-    width:15em;
-    height: 3em;
+    width: 12em;
+    height: 3.75em;
     border-radius: 5%;
     border: none;
     color:white;
@@ -199,3 +199,37 @@ background-color: #2E6939;;
 #RMP-btn:hover{
     background-color: #7a8c68;
 }
+#RMP-btn, .small {
+
+    margin-right: 2em; /*Ensures some spacing on the right */
+}
+
+.left-btns {
+    margin-left:0.27em;
+    display: flex;
+    flex-direction: column; /* Aligns items in a column */
+    align-items: flex-start; /* Aligns items to the left */
+}
+
+.right-btn {
+    display: flex;
+    justify-content: flex-end; /* Aligns the Write a Review button to the right */
+}
+
+
+.select-input {
+    background-color: #E5DED6; 
+    border: none; 
+    border-radius: 5px;
+    padding: 0.8em 1em; 
+    color: black;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease; 
+    width:11.2em;
+}
+
+.select-input:hover {
+    background-color: #D1CAB8; 
+}
+

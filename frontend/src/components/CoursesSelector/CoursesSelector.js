@@ -25,7 +25,7 @@ export default function CoursesSelector(){
       const fetchCourses = useCallback(async () => {
         try {
           setIsLoading(true);
-          const response = await fetch("http://localhost:3456/getCourses", {
+          const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getCourses`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export default function CoursesSelector(){
       <div className="course-buttons">
       {filteredCourses.map((course) => (
             <li key={course.id} >
-              <div className = "course-preview" onClick={ () => courseClick(course.department,course.name)}>
+              <div className = "course-preview" onClick={ () => courseClick(department,course.name)}>
                 <div className = "rating-container">
                   <p className = "rating-label">Quality:</p>
                   <div className = "rating-box" style={{backgroundColor: colors[Math.round(course.avgQuality)]}}>

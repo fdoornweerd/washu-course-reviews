@@ -65,7 +65,7 @@ async function getClasses(SEMESTERS_BACK){
     const jsonData = [];
     const departments = [];
 
-    for(let i=0; i<1; i++){
+    for(let i=0; i<numSchoolLinks; i++){
         
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
@@ -125,7 +125,7 @@ async function getClasses(SEMESTERS_BACK){
 
                 const num = numClassLinks > 3 ? 3 : numClassLinks;
                 
-                for(let k=0; k<0; k++){
+                for(let k=0; k<numClassLinks; k++){
                     // update so links dont become stale
                     classContainer = await driver.findElement(By.xpath(classXPath));
                     let classLinks = await classContainer.findElements(By.xpath('//*[@id="Body_oCourseList_tabSelect"]/div'));
@@ -202,7 +202,12 @@ async function getClasses(SEMESTERS_BACK){
                                     await instructor.click();
                                     windowHandles = await driver.getAllWindowHandles();
                                     await driver.switchTo().window(windowHandles[windowHandles.length - 1]);
-                                    element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
+                                    try{
+                                        element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
+                                    } catch (err){
+                                        continue;
+                                    }
+                                    
                                  }
                                 
                                  const fullName = await element.getText();
@@ -255,8 +260,8 @@ const client = new MongoClient(uri);
 
 async function run() {
 
-    const SEMESTERS_BACK = [3,4];
-
+   // const SEMESTERS_BACK = [8,7,4,3];
+   const SEMESTERS_BACK = [8];
     try {
     for(const semesterBack of SEMESTERS_BACK){
 

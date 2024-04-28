@@ -20,12 +20,19 @@ const {
 
 
 
-
-
 const app = express();
-app.use(cors());
 app.use(bodyParser.json());
 
+
+/*
+const corsOptions = {
+    origin: 'http://ec2-54-225-17-211.compute-1.amazonaws.com:3000'
+};
+
+app.use(cors(corsOptions));
+*/
+
+app.use(cors());
 
 
 const port = 3456;
