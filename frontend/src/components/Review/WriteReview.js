@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from "react";
+import React, { useState, useEffect,useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import ReactLoading from "react-loading";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +26,7 @@ export default function WriteReview() {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const hourOptions = ['1','2-4', '5-8', '9-12', '13+'];
+  const hourOptions = useMemo(() => ['2 or less', '2-4', '4-6', '6-8', '8-10', '10+'], []);
   const time = new Date();
   const formatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
@@ -42,6 +42,26 @@ export default function WriteReview() {
     [5,["#DD3730", "Super hard"]],
   ]);
   const { department, name } = useParams();
+
+
+  const [isSmallWindow, setIsSmallWindow] = useState(false);
+  const handleResize = () => {
+    if (window.innerWidth < 830) {
+        setIsSmallWindow(true);
+      } else{
+        setIsSmallWindow(false);
+      }
+  };
+      useEffect(() => {
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+
+
+
     
   const fetchCourse = useCallback(async () => {
       try {
@@ -55,6 +75,7 @@ export default function WriteReview() {
         });
         const data = await response.json();
         setCourse(data);
+        handleResize();
         setFormData(prevFormData => ({
           ...prevFormData,
           hours: hourOptions[0],
@@ -64,7 +85,7 @@ export default function WriteReview() {
       } finally {
           setIsLoading(false);
       }
-    }, [department,name]);
+    }, [name,hourOptions]);
 
     useEffect(() => {
         fetchCourse();
@@ -89,7 +110,8 @@ export default function WriteReview() {
             date: formatter.format(time)
           }),
         });
-        const data = await response.json();
+        const reviewID = await response.json();
+        localStorage.setItem(reviewID,1);
       } catch (error) {
         console.error("Error inserting review:", error);
       }
@@ -137,7 +159,7 @@ export default function WriteReview() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormSubmitted(true);
-    const response = await insertReview();
+    await insertReview();
     setFormData({
       prof: '',
       quality: '',
@@ -181,7 +203,7 @@ export default function WriteReview() {
       <div className = "form-container">
       <div className = "input-section">
       <label> Professor: </label>
-      <details>
+      <details id='prof_dropdown'>
         <summary> Choose one or many</summary>
       <ul id = "dropdown">
       {[...course.instructors]
@@ -195,7 +217,7 @@ export default function WriteReview() {
       </div>
       <div className = "input-section">
         <label htmlFor="quality"> Quality: </label>
-        <div className="shapes">
+        <div className="stars">
       {[...Array(5)].map((_, index) => {
     const givenRating = index + 1;
     return (
@@ -243,8 +265,14 @@ export default function WriteReview() {
       </label>
     );
   })}
-   <p id = "tempText">{tempText}</p>
+  {!isSmallWindow &&
+    <p id = "tempText">{tempText}</p>
+  }
+   
   </div>
+  {isSmallWindow &&
+    <p id = "tempText">{tempText}</p>
+  }
       </div>
       <div className = "input-section">
       <label htmlFor="hours">Hours/week outside of course:</label>
@@ -256,7 +284,7 @@ export default function WriteReview() {
         ))}
        </select>
       </div>
-      <div className = "input-section">
+      <div className = "input-section" id='commment-container'>
       <label htmlFor="comment">Comment:</label>
       </div>
       <div className="input-section">

@@ -18,6 +18,7 @@ function App() {
               <div className="App">
                     <div className="title">
                       <h1>WashU Course Reviews</h1>
+                      <hr className='line'></hr>
                     </div>
                 <div className="tabs">
                   <Tabs schools={schools}/> 

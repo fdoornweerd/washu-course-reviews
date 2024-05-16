@@ -1,9 +1,21 @@
 const { Builder, By, Key, until } = require("selenium-webdriver");
-const { MongoClient } = require("mongodb");
+const DB = require('./database.js'); 
 require('dotenv').config();
 
 // schools to scrape
 const SCHOOLS_ALLOWED = ['Architecture','Art','Arts & Sciences','Business','Engineering','Interdisciplinary Programs'];
+
+
+const DEPARTMENTS_EXCLUDED = [
+    'THE GRADUATE SCHOOL(LGS)',
+    'OVERSEAS PROGRAMS(L99)',
+    'ENGINEERING GRADUATE STUDIES(EGS)'
+]
+
+const ATTRIBUTE_SCHOOLS_ALLOWED = ['A&S IQ','Arch','Art','BU','EN'];
+const ATTRIBUTE_SCHOOLS_EXCLUDED = ['A&S','Art-Arch','CFH','E LIT','General','Law','Med','UColl','Writing']
+
+
 const EXCLUDED_CLASSES = [
     'Thesis Research',
     'Degree Project',
@@ -20,7 +32,10 @@ const EXCLUDED_CLASSES = [
     `Thesis and Dissertation Research`,
     'Master\'s Thesis',
     `Dissertation Research`,
-    'RESEARCH'
+    'RESEARCH',
+    'Independent Study: Internships',
+    'Dissertation',
+    'Dissertation Research in History'
 ]
 
 
@@ -30,7 +45,7 @@ async function getClasses(SEMESTERS_BACK){
     const driver = await new Builder().forBrowser('chrome').build();
 
     await driver.get('https://courses.wustl.edu/Semester/Listing.aspx');
-
+    await driver.manage().window().setRect({width: 1490,height:820});
 
 
     //select semester to update (0 is most recent option)
@@ -65,7 +80,7 @@ async function getClasses(SEMESTERS_BACK){
     const jsonData = [];
     const departments = [];
 
-    for(let i=0; i<numSchoolLinks; i++){
+    for(let i=6; i<7; i++){
         
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
@@ -90,7 +105,7 @@ async function getClasses(SEMESTERS_BACK){
         const numDeptLinks = deptLinks.length;
         
 
-        for(let j=0; j<numDeptLinks; j++){
+        for(let j=1; j<2; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
             deptLinks = await deptContainer.findElements(By.css('a'));
@@ -98,7 +113,16 @@ async function getClasses(SEMESTERS_BACK){
             
 
             const currLinkD = deptLinks[j];
-            const deptName = await currLinkD.getText();
+            let deptName = await currLinkD.getText();
+            if(DEPARTMENTS_EXCLUDED.includes(deptName)){
+                continue;
+            }
+
+            // random webstac error, forgot the comma
+            if(deptName == 'SUPPLY CHAIN, OPERATIONS AND TECHNOLOGY(B57)'){
+                deptName = 'SUPPLY CHAIN, OPERATIONS, AND TECHNOLOGY(B57)';
+            }
+
             departments[departments.length-1].push(deptName);
 
             await driver.actions({ bridge: true }).move({ duration: 500, origin: currLinkD }).perform();
@@ -123,11 +147,11 @@ async function getClasses(SEMESTERS_BACK){
                 let classLinks = await classContainer.findElements(By.xpath('//*[@id="Body_oCourseList_tabSelect"]/div'));
                 const numClassLinks = classLinks.length;
 
-                const num = numClassLinks > 3 ? 3 : numClassLinks;
+                const num = numClassLinks > 1 ? 1 : numClassLinks;
                 
-                for(let k=0; k<numClassLinks; k++){
+                for(let k=0; k<num; k++){
                     // update so links dont become stale
-                    classContainer = await driver.findElement(By.xpath(classXPath));
+                    classContainer =await driver.findElement(By.xpath(classXPath));
                     let classLinks = await classContainer.findElements(By.xpath('//*[@id="Body_oCourseList_tabSelect"]/div'));
 
                     // get current classLink
@@ -159,6 +183,34 @@ async function getClasses(SEMESTERS_BACK){
                     const courseDetailsLink = await currLinkC.findElement(By.css('div.DivDetail > table > tbody > tr > td:nth-child(2) > table:nth-child(1) > tbody > tr > td:nth-child(2) > a'));
                     const courseDetails = await courseDetailsLink.getText();
 
+                    //get attributes
+                    const attributesArray = [];
+                    let attrIdx = -1;
+                    let onAcceptedSchool = false;
+
+                    const courseAttributesLink = await currLinkC.findElements(By.css('div.DivDetail > table > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td:nth-child(2) > a'));
+                    for(const attr of courseAttributesLink){
+                        const text = await attr.getText();
+                        if(ATTRIBUTE_SCHOOLS_ALLOWED.includes(text)){
+                            onAcceptedSchool = true;
+                            attrIdx+=1;
+                            if(text == 'A&S IQ'){
+                                attributesArray.push({'attributeSchool': 'A&S', 'attributeList': []});
+                            }else{
+                                attributesArray.push({'attributeSchool': text, 'attributeList': []});
+                            }
+                        } else{
+                            if(!ATTRIBUTE_SCHOOLS_EXCLUDED.includes(text) && onAcceptedSchool){
+                                attributesArray[attrIdx].attributeList.push(text);
+                            }else{
+                                onAcceptedSchool = false;
+                            }
+                        }
+                    }
+
+
+                    
+
                     // get sections of class (could be 1 or more)
                     const sections = await currLinkC.findElements(By.css('div.ResultTable > table > tbody > tr > td:nth-child(2) > div'));
                     
@@ -170,8 +222,16 @@ async function getClasses(SEMESTERS_BACK){
                     // go through each section
                     
                     for(const section of sections){
+                        // make sure instructor is for class and not subsection
+                        const sectionNum = await section.findElement(By.css('table > tbody > tr:nth-child(1) > td:nth-child(2)')).getText();
+                        // Dont insert subsection leaders
+                        if(/[A-Z]/.test(sectionNum)){
+                            continue;
+                        }
+
+
                         // get the instructors labeled for the section
-                        const instructorContainer = section.findElement(By.css('table > tbody > tr:nth-child(1) > td:nth-child(6)'));
+                        const instructorContainer = await section.findElement(By.css('table > tbody > tr:nth-child(1) > td:nth-child(6)'));
                         const instructorLink = await instructorContainer.findElements(By.css('a'));
 
                         // go through each instructor for the course (1 or more) and click on their name to get full name
@@ -199,7 +259,7 @@ async function getClasses(SEMESTERS_BACK){
                                     element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
                                  } catch(err){
                                     // couldn't click on name so click again and do steps
-                                    await instructor.click();
+                                    await instructor.click(); //HERE IS ISSUE
                                     windowHandles = await driver.getAllWindowHandles();
                                     await driver.switchTo().window(windowHandles[windowHandles.length - 1]);
                                     try{
@@ -237,6 +297,7 @@ async function getClasses(SEMESTERS_BACK){
                             "department": [deptName],
                             "instructors": instructorNames,
                             "courseDetails":courseDetails,
+                            "attributes": attributesArray,
                             "lastOffered": semester,
                             "numScores": 0,
                             "avgDifficulty": 0,
@@ -254,22 +315,16 @@ async function getClasses(SEMESTERS_BACK){
 
 
 // Replace the uri string with your connection string.
-const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-const client = new MongoClient(uri);
 
 async function run() {
+   const database = await DB.connect(process.env.MONGODB_URI);
+   const SEMESTERS_BACK = [8,7];
 
-   // const SEMESTERS_BACK = [8,7,4,3];
-   const SEMESTERS_BACK = [8];
     try {
     for(const semesterBack of SEMESTERS_BACK){
 
-
         const [semester,coursesData, departments] = await getClasses(semesterBack);
-    
-        // insert courses/departments into db
-        const database = client.db('RateMyCourse');
     
     
     
@@ -300,9 +355,6 @@ async function run() {
             // get course from database with unqiue course code
             const courseFilter = { name: course.name }
             const existingCourse = await courses.findOne(courseFilter);
-    
-    
-    
     
             if(!existingCourse){
                 // if it doesnt exist insert it
@@ -422,6 +474,29 @@ async function run() {
                     const updateResult = await courses.updateOne(courseFilter, update);
                     console.log(`Updated course description for ${course.department[0]} - ${course.name}`);
                }
+
+
+               // use most updated attributes for courses
+               const update = {
+                    $set: {attributes: course.attributes}
+                }
+                const updateResult = await courses.updateOne(courseFilter, update);
+
+
+                // add course attribute if not there already
+                const attr = database.collection('attributions');
+
+                for(let i=0; i<course.attributes.length; i++){
+                    for(let j=0; j<course.attributes[i].attributeList.length; j++){
+                        const existingAttr = await attr.findOne({ school: course.attributes[i].attributeSchool, attribute: course.attributes[i].attributeList[j] });
+
+                        if(!existingAttr){
+                            const result = await attr.insertOne({school: course.attributes[i].attributeSchool, attribute: course.attributes[i].attributeList[j]});
+                            console.log(`Inserted Attribution: ${course.attributes[i].attributeSchool} - ${course.attributes[i].attributeList[j]}`);
+                        }
+                    }
+
+                }
                
             }
         }
@@ -429,7 +504,7 @@ async function run() {
 
 
     } finally {
-        await client.close();
+        await DB.close();
 
     }
 }

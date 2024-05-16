@@ -33,3 +33,23 @@ h2{
     justify-content: center;
     margin-top: 25%;
 }
+
+@media (max-width: 830px) {
+    .depts {
+        flex-direction: column; /* Align buttons in a single column */
+        align-items: center; /* Center buttons horizontally */
+    }
+    
+    .dept-btn {
+        width: 90%; /* Make button width responsive to screen size */
+        margin: 1em; /* Reduce margin for tighter spacing */
+    }
+    
+    h2 {
+        text-align: center; /* Center-align the header for better aesthetics */
+    }
+
+    .loadingScreen {
+        margin-top: 20%; /* Adjust loading screen placement for better visibility */
+    }
+}

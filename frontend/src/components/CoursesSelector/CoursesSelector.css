@@ -20,6 +20,7 @@ input[type = "text"]{
     background-color: rgb(239, 239, 239);
     border-radius: 5px;
     align-items: center;
+    overflow-x: hidden; 
 }
 .course-list {
     display: flex;
@@ -59,12 +60,14 @@ input[type = "text"]{
 .search-bar{
     box-sizing: border-box;
     display: flex;
-    width:100%;
-    background-color:#C0CCA4;
+    width: 100%;
+    background-color: #C0CCA4;
     border: .1em solid #2E6939;
     justify-content: center;
     padding: 1em 2em 1em 1em;
+    gap: 20px;
 }
+
 .course-buttons li {
     list-style-type: none;
     display: inline-block;
@@ -81,9 +84,10 @@ input[type = "text"]{
 }
 
 .btn-container{
-padding-left:2em;
-display: flex;
-justify-content: left;
+    margin-top: 1em;
+    padding-left:2em;
+    display: flex;
+    justify-content: left;
 }
 .back-btn{
     background-color: #1B4726;
@@ -99,22 +103,111 @@ background-color: #2E6939;;
 .white{
     background-color: white !important;
 }
-#rest-of-li{
-    width:60%;
-    padding: 2em;
-    display:flex;
-    justify-content: left;
+#rest-of-li {
+    display: flex;
+    flex-direction: column; /* Align children vertically */
+    align-items: flex-start; /* Align items to the start of the flex container */
+    padding: 1em; /* Adjust padding as necessary */
+    width: 100%; /* Ensure it takes full width of its parent */
 }
+
+.course-preview:hover{
+    background-color: rgb(230, 230, 230);
+}
+
 .course-btn {
-   width:100%;
-   height:100%;
-   text-align: left;
+    width: 100%; /* Ensure it takes full width */
+    text-align: left;
     color: #2E6939;
     font-size: large;
     background-color: transparent;
     font-weight: bold;
     border: none;
+    padding: 0.5em 0; /* Add padding for spacing */
 }
-.course-preview:hover{
-    background-color: rgb(230, 230, 230);
+
+.course-code {
+    font-size: normal; /* Smaller font size than the course name */
+    color: rgba(46, 105, 57, 0.5); /* More faded color, using RGBA for transparency */
+    display: block; /* Ensures it appears below the course name */
+    width: 100%; /* Take the full width to ensure it doesn't float next to anything else */
 }
+
+#viewMore{
+    margin-bottom:3em;
+    border-radius: 5%;
+    background-color: #D3D3D3;
+    padding:1em 2em;
+    cursor: pointer;
+}
+#viewMore:hover{
+    background-color: #acacac;
+}
+
+.title-container{
+    font-size:1.25em;
+    font-weight: bold;
+}
+.dropDown-container{
+    display: flex;  
+    gap:1em;
+}
+.ratings-parent {
+    display: flex;           /* Establishes a flex container */
+    flex-direction: row;     /* Aligns children horizontally, this is default and can be omitted */
+    justify-content: flex-start; /* Aligns children at the start of the parent container */
+    align-items: center;     /* Aligns items vertically in the center */
+    gap: 0.3em;               /* Optional: adds space between children */
+}
+
+
+@media (max-width:830px){
+    .search-bar{
+        padding: 1em 0em;
+        display: flex;        /* Enables Flexbox */
+        flex-direction: column; /* Stacks children vertically */
+        align-items: center;  /* Centers children horizontally */
+        justify-content: center; /* Centers children vertically, optional based on content size */
+        width: 100%;   
+    }
+    .ratings-parent{
+        margin-left: 0.5em;
+    }
+    .course-buttons li {
+        width:95%;
+        height: auto;
+        margin-right:0em;
+        margin-left:0em;
+        /* min-height: 10em; */
+    }
+    .course-preview{
+        padding: 0em;
+        margin: 0em;
+        width: 100%;
+        overflow-x: hidden; 
+        min-height: 10em;
+    }
+    .course-list{
+        padding: 0em;
+        margin: 0em;
+    }
+    .search-bar-input{
+        height: 3.5em;
+    }
+    .smaller-width-sub{
+        width: 6em !important;
+        min-width: 0;
+    }
+    .dropDown-container{
+        gap:6px;
+    }
+    #dropdown{
+        overflow: hidden;
+    }
+    .course-buttons{
+        margin-right:0em;
+        margin-left: 0em;
+    }
+
+}
+

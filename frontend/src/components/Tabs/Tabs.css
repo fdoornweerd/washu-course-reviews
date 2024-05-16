@@ -15,8 +15,31 @@
 
 .school-btn:hover, .school-btn.active {
   background-color: #7f9061; 
+  color: white;
 }
 
 .school-btn:focus {
   background-color: #76845d;
+  color: white;
 }
+
+@media (max-width: 830px) {
+  .nav {
+      grid-template-columns: repeat(2, 1fr); /* Set the tabs to two per row */
+  }
+
+  .school-btn {
+      width: 90%; /* Adjust button width for screen size */
+      height: 5em; /* Ensure consistent height based on content */
+      margin: 0.5em auto; /* Center and add margin for spacing */
+      padding: 1em 0; /* Increase padding for better tap targets */
+  }
+
+  #viewAll-btn {
+    grid-column: 1 / -1; /* Make the last button span all columns */
+    margin: 0.5em 1em 0em 1em;
+    width: calc(100% - 2em); /* Set width to 100% minus margins */
+    
+  }
+}
+

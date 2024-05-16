@@ -1,4 +1,4 @@
-const { getSchools, getDepartments, getCourses,insertReview, fetchReviews } = require('./functions');
+const { getSchools, getDepartments, getCourses,insertReview, fetchReviews,updateReactions, getAttributions } = require('./functions');
 
 async function test() {
     try {
@@ -13,6 +13,8 @@ async function test() {
         // console.log(await fetchReviews("A46 ARCH 175", "mr. mark"))
 
        // console.log(await getCourses("Architecture", "LANDSCAPE ARCHITECTURE(A48)"))
+       let c = await getAttributions();
+       console.log(c);
     } catch (error) {
         console.error('Error:', error);
     }

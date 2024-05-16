@@ -1,21 +1,21 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 var cors = require('cors');
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
+const DB = require('./database.js'); 
 
-const { MongoClient } = require("mongodb");
-const OpenAI = require("openai");
+
 require('dotenv').config();
 
 const {
-    getSchools,
     getDepartments,
     getCourses,
     getCourse,
-    searchCourses,
-    getProfessorLink,
     insertReview,
-    fetchReviews,
-    summarizeReviews
+    updateReactions,
+    getAttributions
 } = require('./functions');
 
 
@@ -26,8 +26,15 @@ app.use(bodyParser.json());
 
 /*
 const corsOptions = {
-    origin: 'http://ec2-54-225-17-211.compute-1.amazonaws.com:3000'
+    origin: 'https://washucoursereviews.com'
 };
+
+
+const sslOptions = {
+  key: fs.readFileSync(path.resolve(__dirname, '/etc/letsencrypt/live/washucoursereviews.com/privkey.pem')),
+  cert: fs.readFileSync(path.resolve(__dirname, '/etc/letsencrypt/live/washucoursereviews.com/fullchain.pem'))
+};
+
 
 app.use(cors(corsOptions));
 */
@@ -87,42 +94,46 @@ app.post('/insertReview', async (req, res) => {
         const comment = req.body.comment;
         const date = req.body.date;
 
-        await insertReview(quality, difficulty, professor, hours, comment, date, courseName)
-        res.json(true);
+        const id = await insertReview(quality, difficulty, professor, hours, comment, date, courseName)
+        res.json(id);
     } catch (error) {
         console.error("Error fetching courses:", error);
         res.status(500).json({ error: "Failed to fetch courses" });
     }
 });
 
-app.post('/logIn', async (req, res) => {
+app.post('/updateReaction', async (req, res) => {
     try {
-        const uri = "mongodb+srv://fdoornweerd:"+process.env.MONGODB_PASSWORD+"@cluster0.glst1ub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        courseName = req.body.courseName;
+        review_id = req.body.review_id;
+        isLike = req.body.isLike;
+        change = req.body.change;
 
-        const client = new MongoClient(uri);
-        const database = client.db('RateMyCourse');
-        const users = database.collection('users');
-    
-        try{
-            const un = req.body.user
-            await users.insertOne(un);
-            
-        
-        } catch (err){
-            console.error('Error fetching courses:', err);
-            return [];
-        } finally {
-            await client.close();
-        }
-
-
-
-
+        await updateReactions(courseName,review_id,isLike,change);
         res.json(true);
     } catch (error) {
-        console.error("Error fetching courses:", error);
-        res.status(500).json({ error: "Failed to fetch courses" });
+        console.error("Error updating like:", error);
+        res.status(500).json({ error: "Error updating like" });
     }
+});
+
+
+app.post('/getAttributions', async (req, res) => {
+    try {
+        const result = await getAttributions();
+        res.json(result);
+    } catch (error) {
+        console.error("Error fetching attributions:", error);
+        res.status(500).json({ error: "Failed to fetch attributions" });
+    }
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    console.log('Received SIGINT, shutting down gracefully.');
+    await DB.close();
+    console.log('Database connection closed.');
+    process.exit(0); // Exit successfully
 });
 
 
@@ -130,3 +141,7 @@ app.post('/logIn', async (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
+/*
+https.createServer(sslOptions, app).listen(port, () => {
+    console.log(`HTTPS server running on port ${port}`);
+});*/

@@ -2,16 +2,42 @@ import React, { useState, useEffect,useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactLoading from "react-loading";
 import "./Course.css";
+import ViewReview from "../ViewReview/ViewReview";
 
 export default function Course(){
     const [course, setCourse] = useState([])
+    const [isDisabled, setIsDisabled] = useState(false);
     const [isLoading, setIsLoading] = useState(true)
     const [isDetailsShown, setIsDetailsShown ] = useState(false);
     const [isAnimated, setIsAnimated] = useState(false);
+    const [profScores, setProfScores] = useState([0,0]);
     const [selectedProfessor, setSelectedProfessor] = useState(['','',''])
+
+    // adjust structure for phone
+    
+
     const navigate = useNavigate();
 
-    const { department, name } = useParams();
+
+
+    const [isSmallWindow, setIsSmallWindow] = useState(false);
+    const handleResize = () => {
+      if (window.innerWidth < 830) {
+          setIsSmallWindow(true);
+        } else{
+          setIsSmallWindow(false);
+        }
+    };
+    useEffect(() => {
+      window.addEventListener('resize', handleResize);
+      return () => {
+          window.removeEventListener('resize', handleResize);
+      };
+  }, []);
+
+    let { department, name } = useParams();
+    name = decodeURIComponent(name);
+
     const colors = ["#D3D3D3","#DD3730","#FF9500","#FFCD00","#9ED10F","#3BA500"];
     const difficultColors= ["#3BA500","#9ED10F","#FFCD00","#FF9500","#DD3730"]; //green, green yellow, yellow, light red, dark red
     const fetchCourse = useCallback(async () => {
@@ -26,16 +52,22 @@ export default function Course(){
           });
           const data = await response.json();
           setCourse(data);
+          handleResize();
+          const value = localStorage.getItem(data._id);
+          if (value) {
+              setIsDisabled(true);
+          }
         } catch (error) {
           console.error("Error fetching course:", error);
         } finally {
             setIsLoading(false);
         }
       }, [name]);
-
+      
       useEffect(() => {
         fetchCourse();
       }, [fetchCourse, name]);
+
       
       const animatedStyle = {animation: "inAnimation 400ms ease-in"};
       const unanimatedStyle = {
@@ -74,7 +106,46 @@ export default function Course(){
         semestersTaught = '';
       }
       setSelectedProfessor([lastName,fullName,semestersTaught]);
+      updateAvgScores(lastName);
+    }
 
+
+
+    const updateAvgScores = useCallback((lastName) => {
+        if(course.reviews == null){
+          return;
+        }
+        let quality = 0;
+        let difficulty = 0;
+        let numScores = 0
+        for(const review of course.reviews){
+          if(lastName === '' || review.instructor.includes(lastName)){
+            quality+=parseInt(review.quality);
+            difficulty+=parseInt(review.difficulty);
+            numScores+=1;
+          }
+        }
+        const avgQuality = numScores > 0 ? (quality / numScores).toFixed(1) : 'N/A';
+        const avgDifficulty = numScores > 0 ? (difficulty / numScores).toFixed(1) : 'N/A';
+
+        setProfScores([avgQuality,avgDifficulty]);
+      },[course.reviews])
+
+      useEffect(() => {
+        if (course && course.reviews) {
+            updateAvgScores('');
+        }
+      }, [course, updateAvgScores]); 
+
+
+    const displayAttributes = () => {
+      let display = '';
+      for(const attrSchool of course.attributes){
+        display+=(`${attrSchool.attributeSchool}: `+ attrSchool.attributeList.join(', ')+'\u00A0\u00A0\u00A0\u00A0')
+      }
+
+      return display;
+      
     }
 
     const handleBack = () => {
@@ -106,6 +177,7 @@ export default function Course(){
     }
 
 
+
       
 
     return (
@@ -118,29 +190,113 @@ export default function Course(){
               <h2>{course.name}</h2>
               <h5>{course.code.map((code, index) => code).join(', ')}</h5>
               </div>
+
+
             </div>
 
-        <div className = "detail">
-          <button id = "description-btn"onClick={() => {
-            setIsAnimated(!isAnimated)
-            if (!isDetailsShown) setIsDetailsShown(true); 
-          }}>{isDetailsShown === true ? 'Hide Course Description' : 'Show Course Description'}</button>
-          {isDetailsShown && <div className="description" style={isAnimated ? animatedStyle : unanimatedStyle} onAnimationEnd={() => { if (!isAnimated) setIsDetailsShown(false) }}>
-            <p id = "course-details">{course.courseDetails}</p>
-            <div className = "small">
-          This course was most recently offered: {course.lastOffered}
+        <div className="review-top-bar">
+        <div className="detail">
+        <div className="section-wrapper">
+
+
+          {isSmallWindow && 
+          <div className="avgResult-container">
+          <div className="rating-section">
+              <p className="avgQuality-label">Quality:</p>
+              <div className="avg-rating-box" style={{ backgroundColor: profScores[0] > 0 ? colors[Math.round(profScores[0])] : '#D3D3D3' }}>
+                  <p className="avg-rating-box-num">{profScores[0] > 0 ? profScores[0] : 'N/A'}</p>
+              </div>
+          </div>
+          <div className="rating-section">
+              <p className="avgDifficulty-label">Difficulty:</p>
+              <div className="avg-rating-box" style={{ backgroundColor: profScores[1] > 0 ? difficultColors[Math.round(profScores[1] - 1)] : '#D3D3D3' }}>
+                  <p className="avg-rating-box-num">{profScores[1] > 0 ? profScores[1] : 'N/A'}</p>
+              </div>
+          </div>
+      </div>
+      }
+
+          {!isSmallWindow && 
+               <button id="description-btn" onClick={() => {
+                setIsAnimated(!isAnimated);
+                if (!isDetailsShown) setIsDetailsShown(true);
+            }}>
+                {isDetailsShown ? 'Hide Course Description' : 'Show Course Description'}
+            </button>
+          }
+       
+            {isSmallWindow && 
+              <button id="description-btn" onClick={() => {
+                  setIsAnimated(!isAnimated);
+                  if (!isDetailsShown) setIsDetailsShown(true);
+              }}>
+                  {isDetailsShown ? 'Hide Course Description' : 'Show Course Description'}
+              </button>
+            }
+            {isDetailsShown && isSmallWindow && (
+                <div className="description" style={isAnimated ? animatedStyle : unanimatedStyle} onAnimationEnd={() => {
+                    if (!isAnimated) setIsDetailsShown(false);
+                }}>
+                    <p id="course-details">{course.courseDetails}</p>
+                    <div className="small">
+                        This course was most recently offered: {course.lastOffered}
+                    </div>
+                    <div className="small">
+                        Attributes: {displayAttributes()}
+                    </div>
+                </div>
+            )}
+
+            {!isSmallWindow && 
+            <div className="avgResult-container">
+            <div className="rating-section">
+                <p className="avgQuality-label">Quality:</p>
+                <div className="avg-rating-box" style={{ backgroundColor: profScores[0] > 0 ? colors[Math.round(profScores[0])] : '#D3D3D3' }}>
+                    <p className="avg-rating-box-num">{profScores[0] > 0 ? profScores[0] : 'N/A'}</p>
+                </div>
+            </div>
+            <div className="rating-section">
+                <p className="avgDifficulty-label">Difficulty:</p>
+                <div className="avg-rating-box" style={{ backgroundColor: profScores[1] > 0 ? difficultColors[Math.round(profScores[1] - 1)] : '#D3D3D3' }}>
+                    <p className="avg-rating-box-num">{profScores[1] > 0 ? profScores[1] : 'N/A'}</p>
+                </div>
+            </div>
         </div>
-            </div>}
+            }
+            
+
+
+            <div className="right-btn">
+              <button id="write-review-btn" onClick={() => writeReview(department, name)} disabled={isDisabled}>Write a Review</button>
+            </div>
+
+            </div>
+
+            {isDetailsShown && !isSmallWindow && (
+                <div className="description" style={isAnimated ? animatedStyle : unanimatedStyle} onAnimationEnd={() => {
+                    if (!isAnimated) setIsDetailsShown(false);
+                }}>
+                    <p id="course-details">{course.courseDetails}</p>
+                    <div className="small">
+                        This course was most recently offered: {course.lastOffered}
+                    </div>
+                    <div className="small">
+                        Attributes: {displayAttributes()}
+                    </div>
+                </div>
+            )}
         </div>
+
+
+          
+    </div>
 
 
 
   <div className="content-container">
-  <div id="before-reviews">
     <div className="review-top-bar">
-      <div>
-        <h3>Reviews For {selectedProfessor[0] === '' ? 'All Professors' : selectedProfessor[0]}</h3>
-      </div>
+
+
       <div className="content-and-btn">
         <label htmlFor="professor-select">Select Professor:</label>
         <select class='select-input' id="professor-select" onChange={selectNewProfessor}>
@@ -149,69 +305,30 @@ export default function Course(){
             <option key={index} value={index}>{instructor.lastName}</option>
           ))}
         </select>
+        {!isSmallWindow && selectedProfessor[2] !== '' && 
+          <p className="small">Semesters Taught In The Past: {selectedProfessor[2].map((semester, index) => semester).join(', ')}</p>
+        }
+        {isSmallWindow && selectedProfessor[2] !== '' && 
+          <div class="semesters-taught-container"> 
+            <p>Semesters Taught In The Past:</p>
+            <p>{selectedProfessor[2].map((semester, index) => semester).join(', ')}</p>
+          </div>
+        }
+        
       </div>
-    </div>
 
-    <div className="review-btn-container">
-      <div className="left-btns">
       {selectedProfessor[0] !== '' && 
           <button id="RMP-btn" onClick={openRateMyProfessor}>Search RateMyProfessor</button>
-        }
-        {selectedProfessor[2] !== '' && 
-          <p className="small">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Semesters Taught In The Past: {selectedProfessor[2].map((semester, index) => semester).join(', ')}</p>
-        }
-      </div>
-      <div className="right-btn">
-        <button id="write-review-btn" onClick={() => writeReview(department, name)}><span>Write a Review</span></button>
-      </div>
+      }
+
     </div>
   </div>
-</div>
-
-
-
-
 
 
 
         <div>
-          {course.reviews.map((review,index) => (
-            (selectedProfessor[0] === '' || review.instructor.includes(selectedProfessor[0])) && ( 
-            <div key={index} className = "review">
-               <div className = "rating-container">
-                  <p className = "rating-label">Quality:</p>
-                  <div className = "rating-box" style={{backgroundColor: colors[Math.floor(review.quality)]}}>
-                    <p className = "rating-box-num">{review.quality >0 ? review.quality : 'N/A'}</p>
-                  </div>
-                </div>
-                <div className = "rating-container">
-                  <p className = "rating-label">Difficulty:</p>
-                  <div className = "rating-box" style={{backgroundColor: difficultColors[Math.round(review.difficulty-1)]}}>
-                    <p className = "rating-box-num">{review.difficulty >0 ? review.difficulty: 'N/A'}</p>
-                  </div>
-                </div>
-                <div className = "review-stack">
-               <div className="professor-and-date">
-              <div className = "professor-container">
-              <p>{review.instructor.length === 0 ? '' : (review.instructor.length === 1 ? 'Professor:' : 'Professors:')} {review.instructor.map((instructor,index) => (
-                  <li key = {index}>{instructor}</li>
-              ))}</p>
-              </div>
-
-              <div id='hours-container'>
-                <p>Hours per week outside of course: {review.hours}</p>
-              </div>
-
-              <div id = "date">
-                <p>{review.date}</p>
-              </div>
-              </div>
-              <div id = "review-content">
-                <p>{review.comment}</p>
-              </div>
-              </div>
-            </div>
-            )
+          {course.reviews.sort((a, b) => b.upVotes - a.upVotes).map((review,index) => (
+            <ViewReview key={index} courseName={course.name} review={review} colors={colors} difficultColors={difficultColors} professor={selectedProfessor[0]} isSmallWidth={isSmallWindow} />
           ))}
         </div>
 

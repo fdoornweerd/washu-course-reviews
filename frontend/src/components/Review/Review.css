@@ -23,9 +23,10 @@ textarea{
 select,
 details {
     display: inline-block;
-   width:12em;
+    width:12em;
     background-color: white;
     cursor: pointer;
+    margin-right: 1em;
 }
 .star{
     width:2em;
@@ -51,6 +52,10 @@ input[type = "radio"]{
 }
 .shapes{
     display: flex;
+}
+.stars{
+    display: flex;
+    margin-left: 1em;
 }
 #tempText{
     display: flex;
@@ -142,4 +147,118 @@ li > label:has(input:checked) {
 
 .select-input:hover {
     background-color: #D1CAB8;
+}
+
+
+@media (max-width: 830px) {
+    .stars{
+        margin-left: 0em;
+    }
+    #reviewForm {
+        flex-direction: column; /* Stacks the children vertically */
+        align-items: center; /* Centers the children horizontally */
+        padding: 0; /* Remove padding if any */
+    }
+
+    .form-container {/* Ensures the container takes full width */
+        box-sizing: border-box; /* Includes padding in width calculation */
+        padding: 0em;
+    }
+
+    .input-section {
+        display: flex; /* Ensures that the contents are laid out inline */
+        flex-direction: column; /* Aligns children vertically */
+        align-items: center; /* Centers the children horizontally */
+        width: 100%; /* Full width for responsiveness */
+        margin-bottom: 3em; /* Adds some space below each section */
+        margin-left: 0em;
+    }
+    
+    label {
+        width: 100%; /* Ensures labels use full container width */
+        text-align: center; /* Centers the text within the label */
+        margin-bottom: 0.5em; /* Space between label and the input element below it */
+    }
+    
+    select {/* Adjust this value to fit your design needs */
+        width: 20%;
+        padding: 0.8em; /* Padding for aesthetic spacing */
+        margin: auto; /* Centers the select box horizontally */
+        display: block; /* Ensures the select element does not inline with other elements */
+    }
+
+    select, details, textarea, input[type="radio"], .select-input {
+        width: 90%; /* Reduces width to 90% to ensure it doesn't touch the edges */
+        margin-top: 10px; /* Adds some space above each element */
+    }
+
+    #submit {
+        width: 100%; /* Full width to align with other elements */
+        justify-content: center; /* Ensures the button is centered */
+    }
+
+    details {
+        width: 90%; /* Adjust width for the details dropdown to prevent overflow */
+    }
+
+    .shapes, .squares {
+        justify-content: center; /* Center these elements which contain interactive icons */
+    }
+
+    .textarea {
+        width: 90%; /* Adjusts the width of textarea to match other input fields */
+    }
+ 
+    
+    .details {
+        width: auto; /* Adjust width based on content */
+        cursor: pointer;
+        margin: 0 auto; /* Auto margins for horizontal centering */
+        display: block; /* Block display to fill the width of the container */
+        text-align: center; /* Centers the text within the details */
+        margin-right: 1em;
+    }
+    
+    #dropdown {
+        width: auto; /* Ensures the dropdown matches the width of the summary */
+        margin: 0 auto; /* Centers the dropdown list */
+        display: block; /* Ensures it behaves like a block element */
+        text-align: left; /* Aligns the dropdown text to the left */
+    }
+    
+    summary {
+        width: 100%; /* Full width of its container */
+        padding: 0.5em; /* Padding for better touch interaction */
+        text-align: center; /* Centers the text inside the summary */
+        background-color: white; /* Background color for visibility */
+        border: 0.1em solid #474747; /* Border for clarity */
+        border-radius: 5px; /* Rounded corners */
+    }
+    
+    ul {
+        padding-left: 0; /* Removes padding */
+        list-style: none; /* Removes bullet points */
+        text-align: left; /* Ensures text alignment inside list */
+    }
+    
+    li > label {
+        display: block; /* Allows the label to take the full width */
+        width: 100%; /* Ensures labels are full width inside list */
+        padding: 0.5em; /* Padding for better readability */
+        text-align: left; /* Aligns text to the left */
+    }
+    
+    li > label:hover,
+    li > label:has(input:checked) {
+        background-color: rgb(239, 239, 239); /* Background color for hover and checked states */
+    }
+    #tempText{
+        margin: 0em;
+    }
+    #commment-container{
+        margin-bottom: 0em;
+    }
+    #submit{
+        margin-bottom: 1em;
+    }
 }

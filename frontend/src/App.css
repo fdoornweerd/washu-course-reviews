@@ -5,12 +5,24 @@ body{
   background-color: #ffffff;
 }
 *{
-  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', 'sans-serif';
 }
 .title{
   color: #474747;
 }
+.line{
+  border: 0;
+  height: 0.1em;
+  background-color: #474747; /* Dark grey color */
+  display: none;
+}
 
+
+@media (max-width:830px){
+  .line{
+    display:block;
+  }
+}
 
 /*
 dark grey:#474747

@@ -23,7 +23,10 @@ export default function Tabs({ schools }) {
             setActiveSchool={setActiveSchool}
           />
         ))}
-        <ViewAll to="/all"></ViewAll>
+        <div id='viewAll-btn'>
+          <ViewAll to="/all"></ViewAll>
+        </div>
+        
       </div>
       <div className="dept-view">
         {activeSchool && <Departments school={activeSchool} />}
