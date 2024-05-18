@@ -17,6 +17,7 @@ export default function WriteReview() {
   const [hover, setHover] = useState(null);
   const [hover2, setHover2] = useState(null);
   const [tempText, setTempText] = useState("");
+  const [tempTextQuality, setTempTextQuality] = useState("");
   const [formData, setFormData] = useState({
     prof: [],
     quality: '',
@@ -41,6 +42,17 @@ export default function WriteReview() {
     [4,["#FF9500", "Hard"]],
     [5,["#DD3730", "Super hard"]],
   ]);
+
+
+
+  const qualityWords = [
+    'Excellent',
+    'Very Good',
+    'Average',
+    'Below Average',
+    'Poor'
+  ]
+
   const { department, name } = useParams();
 
 
@@ -233,14 +245,25 @@ export default function WriteReview() {
         <FaStar
            color = {givenRating <= (hover || rating) ? "#ffc107" : "#e4e5e9"}
           className="star"
-          onMouseEnter={() => setHover(givenRating)}
-          onMouseLeave={() => setHover(null)}
+          onMouseEnter={() => {setHover(givenRating); setTempTextQuality(qualityWords[5-givenRating])}}
+          onMouseLeave={() => {setHover(null); setTempTextQuality("")}}
         />
       </label>
     );
   })}
+    {!isSmallWindow &&
+    <p id = "tempTextQuality">{tempTextQuality}</p>
+  }
   </div>
+  {isSmallWindow &&
+    <p id = "tempTextQuality">{tempTextQuality}</p>
+  }
       </div>
+
+
+
+
+
       <div className = "input-section">
       <label htmlFor="difficulty">Difficulty:</label>
       <div className="shapes">
@@ -266,14 +289,18 @@ export default function WriteReview() {
     );
   })}
   {!isSmallWindow &&
-    <p id = "tempText">{tempText}</p>
+    <p id = "tempTextDifficulty">{tempText}</p>
   }
    
   </div>
   {isSmallWindow &&
-    <p id = "tempText">{tempText}</p>
+    <p id = "tempTextDifficulty">{tempText}</p>
   }
       </div>
+
+
+
+
       <div className = "input-section">
       <label htmlFor="hours">Hours/week outside of course:</label>
       <select class='select-input' name='hours' id='hours' value={formData.hours} onChange={handleChange}>

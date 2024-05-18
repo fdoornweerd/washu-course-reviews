@@ -52,15 +52,28 @@ input[type = "radio"]{
 }
 .shapes{
     display: flex;
+    position: relative;
+    top:-0.75em;
 }
 .stars{
     display: flex;
     margin-left: 1em;
+    position: relative;
+    top:-0.3em;
 }
-#tempText{
+#tempTextQuality{
     display: flex;
-    justify-content: right;
-    margin-left: 2em ;
+    justify-content: flex-start;
+    margin: 0.4em 0em 0em 1em;
+    width: 10em;
+    text-align: left;
+}
+#tempTextDifficulty{
+    display: flex;
+    justify-content: flex-start;
+    margin: 0.7em 0em 0em 1em;
+    width: 10em;
+    text-align: left;
 }
 select,
 summary {
@@ -90,6 +103,10 @@ label {
     border: .1em solid #474747;
     max-height: 10em;
     overflow-y: scroll;
+}
+#prof_dropdown{
+    position: relative;
+    top:-0.27em;
 }
 li{
     margin: 0;
@@ -148,11 +165,22 @@ li > label:has(input:checked) {
 .select-input:hover {
     background-color: #D1CAB8;
 }
+#hours{
+    position: relative;
+    top:-0.3em;
+}
+#commment-container{
+    margin-bottom: 1.5em;
+}
 
 
 @media (max-width: 830px) {
     .stars{
         margin-left: 0em;
+        top:0em;
+    }
+    .shapes{
+        top:0em;
     }
     #reviewForm {
         flex-direction: column; /* Stacks the children vertically */
@@ -252,8 +280,13 @@ li > label:has(input:checked) {
     li > label:has(input:checked) {
         background-color: rgb(239, 239, 239); /* Background color for hover and checked states */
     }
-    #tempText{
+    #tempTextQuality{
         margin: 0em;
+        justify-content: center;
+    }
+    #tempTextDifficulty{
+        margin: 0em;
+        justify-content: center;
     }
     #commment-container{
         margin-bottom: 0em;
