@@ -58,16 +58,16 @@ async function getClasses(SEMESTERS_BACK){
         const semesterBtn = await driver.findElement(By.css('[id="Body_UpdatePanel1"] > a:nth-child('+adjusted+')'));
         semester = await semesterBtn.getText();
         await semesterBtn.click();
-        await driver.sleep(1000);
+        await driver.sleep(3000);
     } else{
         const moreBtn = await driver.findElement(By.css('[id="Body_hlMoreSemesters"]'));
         await moreBtn.click();
-        await driver.sleep(1000);
+        await driver.sleep(3000);
 
         const semesterBtn = await driver.findElement(By.css('[id="Body_divMoreSems"] > a:nth-child('+(adjusted-8)+')'));
         semester = await semesterBtn.getText();
         await semesterBtn.click();
-        await driver.sleep(2000);
+        await driver.sleep(6000);
     }
 
 
@@ -80,7 +80,7 @@ async function getClasses(SEMESTERS_BACK){
     const jsonData = [];
     const departments = [];
 
-    for(let i=6; i<7; i++){
+    for(let i=0; i<numSchoolLinks; i++){
         
         // update so links dont become stale
         schoolContainer = await driver.findElement(By.xpath(schoolXPath));
@@ -105,7 +105,7 @@ async function getClasses(SEMESTERS_BACK){
         const numDeptLinks = deptLinks.length;
         
 
-        for(let j=1; j<2; j++){
+        for(let j=0; j<numDeptLinks; j++){
             // update so links dont become stale
             deptContainer = await driver.findElement(By.xpath(departmentXPath));
             deptLinks = await deptContainer.findElements(By.css('a'));
@@ -147,9 +147,9 @@ async function getClasses(SEMESTERS_BACK){
                 let classLinks = await classContainer.findElements(By.xpath('//*[@id="Body_oCourseList_tabSelect"]/div'));
                 const numClassLinks = classLinks.length;
 
-                const num = numClassLinks > 1 ? 1 : numClassLinks;
+                const num = numClassLinks > 5 ? 5 : numClassLinks;
                 
-                for(let k=0; k<num; k++){
+                for(let k=0; k<numClassLinks; k++){
                     // update so links dont become stale
                     classContainer =await driver.findElement(By.xpath(classXPath));
                     let classLinks = await classContainer.findElements(By.xpath('//*[@id="Body_oCourseList_tabSelect"]/div'));
@@ -314,12 +314,10 @@ async function getClasses(SEMESTERS_BACK){
 }
 
 
-// Replace the uri string with your connection string.
-
 
 async function run() {
    const database = await DB.connect(process.env.MONGODB_URI);
-   const SEMESTERS_BACK = [8,7];
+   const SEMESTERS_BACK = [4,3];
 
     try {
     for(const semesterBack of SEMESTERS_BACK){

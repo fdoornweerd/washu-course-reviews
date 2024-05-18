@@ -68,7 +68,7 @@ export default function CoursesSelector(){
               body: JSON.stringify({}),
           });
           const attrData = await response.json();
-          setAttrSchools([...new Set(attrData.map(item => item.school))]);
+          setAttrSchools([...new Set(attrData.map(item => item.school))].sort());
           setAttributions(attrData);
       } catch (error) {
           console.error("Error fetching attributions:", error);
@@ -193,7 +193,7 @@ export default function CoursesSelector(){
       }
 
       const getAttributes = (school) => {
-        return attributions.filter(attr => attr.school === school).map(attr => attr.attribute)
+        return attributions.filter(attr => attr.school === school).map(attr => attr.attribute).sort()
     };
 
 

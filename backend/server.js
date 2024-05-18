@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 
 /*
 const corsOptions = {
-    origin: 'https://washucoursereviews.com'
+    origin: ['https://washucoursereviews.com', 'https://www.washucoursereviews.com']
 };
 
 
@@ -141,6 +141,7 @@ process.on('SIGINT', async () => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
+
 /*
 https.createServer(sslOptions, app).listen(port, () => {
     console.log(`HTTPS server running on port ${port}`);
