@@ -13,13 +13,12 @@ export default function Course(){
     const [profScores, setProfScores] = useState([0,0]);
     const [selectedProfessor, setSelectedProfessor] = useState(['','',''])
 
-    // adjust structure for phone
-    
+
 
     const navigate = useNavigate();
 
 
-
+    // adjust structure for phone
     const [isSmallWindow, setIsSmallWindow] = useState(false);
     const handleResize = () => {
       if (window.innerWidth < 830) {
@@ -327,7 +326,7 @@ export default function Course(){
 
 
         <div>
-          {course.reviews.sort((a, b) => b.upVotes - a.upVotes).map((review,index) => (
+          {course.reviews.sort((a,b) => b.comment.length - a.comment.length).sort((a, b) => b.upVotes - a.upVotes).map((review,index) => (
             <ViewReview key={index} courseName={course.name} review={review} colors={colors} difficultColors={difficultColors} professor={selectedProfessor[0]} isSmallWidth={isSmallWindow} />
           ))}
         </div>
