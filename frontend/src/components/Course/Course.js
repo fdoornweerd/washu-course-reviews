@@ -86,7 +86,8 @@ export default function Course(){
     }
     
     const writeReview = (deptNav,nameNav) => {
-      navigate(`/${deptNav}/${nameNav}/review`);
+      const encodedName = encodeURIComponent(nameNav);
+      navigate(`/${deptNav}/${encodedName}/review`);
     }
 
     const selectNewProfessor = (event) => {

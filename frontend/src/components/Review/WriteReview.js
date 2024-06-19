@@ -179,7 +179,8 @@ export default function WriteReview() {
       hours: '',
       comment: '',
     });
-    navigate(`/${department}/${name}`);
+    const encodedName = encodeURIComponent(name);
+    navigate(`/${department}/${encodedName}`);
   };
 
   if (isLoading) {
@@ -200,12 +201,13 @@ export default function WriteReview() {
       </>
     )  
   }
-  
+
+
   return (
     <>
     <div className = "top-bar">
     <div className="btn-container">
-    <button className = "back-btn" onClick={() => navigate(`/${department}/${name}`)}>Back</button>
+    <button className = "back-btn" onClick={() => navigate(`/${department}/${encodeURIComponent(name)}`)}>Back</button>
     </div> 
     <div className="title-container">
     <h2>Review for: {course.name}</h2>

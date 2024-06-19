@@ -34,7 +34,6 @@ async function countReviews(){
         const courses = database.collection('courses');
     
         const allCourses = await courses.find().toArray();;
-        console.log(allCourses);
         
         for(c of allCourses){
             reviewNum+=c.reviews.length;
@@ -43,7 +42,6 @@ async function countReviews(){
     } catch(err){
         console.log(err);
     } finally{
-
         return reviewNum;
     }
 
