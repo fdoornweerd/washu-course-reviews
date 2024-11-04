@@ -252,17 +252,23 @@ async function getClasses(SEMESTERS_BACK){
                                  // Switch to the newly opened tab
                                  await driver.switchTo().window(windowHandles[windowHandles.length - 1]);
                                 
+                                 
+                                 
 
                                  //get FULL instructor name 
                                  let element;
                                  try {
+                                    // await for instructor page to load
+                                    await driver.wait(until.titleIs('Instructor Courses'), 20000);
                                     element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
                                  } catch(err){
                                     // couldn't click on name so click again and do steps
-                                    await instructor.click(); //HERE IS ISSUE
+                                    instructor.click(); //HERE IS ISSUE
                                     windowHandles = await driver.getAllWindowHandles();
                                     await driver.switchTo().window(windowHandles[windowHandles.length - 1]);
                                     try{
+                                        // await for instructor page to load
+                                        await driver.wait(until.titleIs('Instructor Courses'), 20000);
                                         element = await driver.wait(until.elementLocated(By.id('oInstructorResults_lblInstructorName')), 20000);
                                     } catch (err){
                                         continue;
@@ -317,7 +323,7 @@ async function getClasses(SEMESTERS_BACK){
 
 async function run() {
    const database = await DB.connect(process.env.MONGODB_URI);
-   const SEMESTERS_BACK = [4,3];
+   const SEMESTERS_BACK = [1];
 
     try {
     for(const semesterBack of SEMESTERS_BACK){

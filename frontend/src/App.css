@@ -17,10 +17,21 @@ body{
   display: none;
 }
 
+.about-btn{
+  position: absolute; /* Position it relative to the title */
+  top: 10px; /* Adjust the vertical position */
+  right: 1px; /* Align to the upper right corner */
+}
+
 
 @media (max-width:830px){
   .line{
     display:block;
+  }
+
+  .about-btn{
+    position: relative;
+    display: block;
   }
 }
 

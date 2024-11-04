@@ -13,6 +13,15 @@ export default function Departments({ school }) {
   useEffect(() => {
     const fetchDepartments = async () => {
       setIsLoading(true); // Start loading
+
+      // clear session storage in case the user used browser's back btn and not the one I made
+      sessionStorage.removeItem('searchTerm');
+      sessionStorage.removeItem('filterType');
+      sessionStorage.removeItem('selectedAttribute');
+      sessionStorage.removeItem('selectedSchoolAttr');
+      sessionStorage.removeItem('savedCourses');
+      sessionStorage.removeItem('savedAttributions');
+
       try {
         const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getDepartments`, {
           method: "POST",

@@ -1,0 +1,62 @@
+body {
+    background-color: #f9f9f9; /* Light background color */
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+  }
+
+
+  .container{
+    line-height: 1.6; /* Improve line spacing */
+    margin-bottom: 20px; /* Spacing between paragraphs */
+
+    display: flex;                  /* Enable flexbox */
+    flex-direction: column;         /* Stack items vertically */
+    justify-content: center;        /* Center items vertically */
+    align-items: center; 
+
+    max-width: 900px; /* Limit width for better readability */
+    margin: 40px auto; /* Center the div with margin */
+    padding: 20px; /* Padding for inner spacing */
+    background-color: white; /* White background for content */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  }
+  
+  .textarea {
+    width: 100%; /* Full width */
+    height: 150px; /* Set height */
+    padding: 10px; /* Padding inside textarea */
+    border: 1px solid #ccc; /* Light grey border */
+    border-radius: 4px; /* Slightly rounded corners */
+    resize: vertical; /* Allow vertical resizing only */
+    margin-bottom: 20px; /* Space below textarea */
+    font-family: inherit; /* Inherit font from parent */
+  }
+  
+  .submit-btn {
+    background-color: #606E52; /* Dark green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for button */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s; /* Smooth transition for hover */
+  }
+  
+  .submit-btn:hover {
+    background-color: #8F8B84; /* Light grey on hover */
+  }
+
+
+  @media (max-width:830px){
+    .container{
+      margin: 2em;
+    }
+
+    .back-btn{
+      display: block; /* Make sure the button is a block-level element */
+      margin: 0 auto; /* Apply automatic horizontal margins */
+    }
+  }
+  

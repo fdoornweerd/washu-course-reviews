@@ -4,7 +4,7 @@ import { useNavigate,useLocation } from 'react-router-dom';
 import ReactLoading from "react-loading";
 import Dropdown from 'react-multilevel-dropdown';
 import './CoursesSelector.css';
-
+import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 
 export default function CoursesSelector(){
   const [courses, setCourses] = useState([]);
@@ -35,6 +35,12 @@ export default function CoursesSelector(){
     window.scrollTo(0, 0);
     const fetchCourses = async () => {
         try {
+          let data;
+          const savedCourses = sessionStorage.getItem('savedCourses');
+
+          if(savedCourses){
+            data = JSON.parse(decompressFromUTF16(savedCourses));
+          } else{
             setIsLoading(true);
             const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getCourses`, {
                 method: "POST",
@@ -43,7 +49,10 @@ export default function CoursesSelector(){
                 },
                 body: JSON.stringify({department: department === undefined ? 'all' : department}),
             });
-            const data = await response.json();
+
+            data = await response.json();
+            sessionStorage.setItem('savedCourses', compressToUTF16(JSON.stringify(data)));
+          }
 
             setCourses(data);
             if(sessionStorage.getItem('prevNumPages')){
@@ -60,14 +69,23 @@ export default function CoursesSelector(){
 
     const fetchAttributions = async () => {
       try {
+        let attrData;
+        const savedAttr = sessionStorage.getItem('savedAttributions');
+        if(savedAttr){
+          attrData = JSON.parse(savedAttr);
+        } else{
           const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/getAttributions`, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify({}),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
           });
-          const attrData = await response.json();
+
+          attrData = await response.json();
+          sessionStorage.setItem('savedAttributions',JSON.stringify(attrData));
+        }
+
           setAttrSchools([...new Set(attrData.map(item => item.school))].sort());
           setAttributions(attrData);
       } catch (error) {
@@ -213,8 +231,8 @@ export default function CoursesSelector(){
         }, 1);
       }
     }, [isLoading]);
-    
-      
+
+
     
     return (
           <div className="course-list">
@@ -225,6 +243,8 @@ export default function CoursesSelector(){
                   sessionStorage.removeItem('filterType');
                   sessionStorage.removeItem('selectedAttribute');
                   sessionStorage.removeItem('selectedSchoolAttr');
+                  sessionStorage.removeItem('savedCourses');
+                  sessionStorage.removeItem('savedAttributions');
                   navigate(`/`);
                   }}>Back</button>
               </div> 

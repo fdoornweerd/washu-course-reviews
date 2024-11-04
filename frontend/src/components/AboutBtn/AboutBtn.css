@@ -1,0 +1,25 @@
+#info-img {
+    width: 40px;  /* Fixed width instead of percentage */
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Ensures the image does not have extra space around it */
+    margin: 0 auto; /* Centers the image in the container */
+}
+
+
+.abt-container {
+    display: block;
+    margin: 0;
+
+    display: inline-block;
+    text-align: center;
+    width: auto; /* Ensure container width is only as wide as needed */
+    margin-right: 1em;
+}
+
+.abt-btn-text{
+    margin-top:0.3em;
+}
+
+.abt-container:hover #info-img {
+    content: url('./information-button-hover.png');
+  }
