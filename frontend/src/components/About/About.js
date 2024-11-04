@@ -31,11 +31,11 @@ export default function About() {
           .send(service_ID, template_ID, templateParams, user_ID)
           .then((response) => {
             //Alter the submit button so it goes from submitting... to submited and wait for one second
-            setSuggestion(""); // Clear the textarea after submission
             setSubmitStatus("Submitted")
 
             // wait so it shows to the user
             setTimeout(() => {
+              setSuggestion(""); // Clear the textarea after submission
               setSubmitStatus("Submit");
               setIsSubmitting(false);
               navigate('/');
