@@ -63,11 +63,13 @@ export default function About() {
             <br></br>
 
             <div>
-                Hey, my name is Finn Doornweerd and I created and maintain the website. When I came back after not working
-                on the website for a bit, I realized a few things that could be improved which I couldn't see until
-                I had taken a break and had a "fresh" set of eyes on it. I assume other people see ways that the website could be improved 
-                or ideas about features that would be
-                helpful, so if that is you, please write me a comment below and I'll read it and see if I can implement it!
+                Hey, my name is Finn Doornweerd and I created and maintain the website for allowing WashU students to review their courses 
+                and find courses to take.
+                When I came back after not working
+                on the website for a bit, I realized there were a few things that could be improved which I couldn't see until
+                I had taken a break. I assume other people see ways that the website could be improved 
+                or have ideas about features that would be
+                helpful, so if that is you, please submit a comment below and I'll read it and see if I can implement it!
             </div>
 
             <br></br>
