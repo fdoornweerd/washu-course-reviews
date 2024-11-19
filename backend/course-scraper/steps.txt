@@ -1,0 +1,6 @@
+1 - run scrape.js to scrape all the courses and add to the database
+2 - run combineCommon.py to combine any courses that are clearly the same but have different names (error with WashU)
+    "Construction and Experience of Black Adolescence" vs "Construction & Experience of Black Adolescence"
+3 - run backup.js to make a backup on the MongoDB cloud server to store a copy of the courses and reviews in case anything bad happens
+4 - go to MongoDB Atlas and delete the '_BACKUP' database with a timestamp that is not the most recent backup
+5 - download binary files to laptop as an additional step to safegaurd
