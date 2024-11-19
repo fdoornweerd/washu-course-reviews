@@ -160,6 +160,12 @@ background-color: #2E6939;;
     gap: 0.3em;               /* Optional: adds space between children */
 }
 
+.review-num-display{
+    text-align: center;
+    margin-top: -0.5em;
+    color: #808080;
+}
+
 
 @media (max-width:830px){
     .search-bar{

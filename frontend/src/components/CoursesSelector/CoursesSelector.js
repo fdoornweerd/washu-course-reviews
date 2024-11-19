@@ -27,8 +27,11 @@ export default function CoursesSelector(){
 
 
 
-  const colors = ["#D3D3D3","#DD3730","#FF9500","#FFCD00","#9ED10F","#3BA500"];//grey, red, yellow, green
-  const difficultColors= ["D3D3D3","#3BA500","#9ED10F","#FFCD00","#FF9500","#DD3730"];
+  // const colors = ["#D3D3D3","#DD3730","#FF9500","#FFCD00","#9ED10F","#3BA500"];//grey, red, yellow, green
+  // const difficultColors= ["D3D3D3","#3BA500","#9ED10F","#FFCD00","#FF9500","#DD3730"];
+
+  const colors = ["#D3D3D3","#e35e59","#ffaa32","#ffd732","#b1da3e","#62b732"];//grey, red, yellow, green
+  const difficultColors= ["D3D3D3","#62b732","#b1da3e","#ffd732","#ffaa32","#e35e59"];
 
   
   useEffect(() => {
@@ -342,20 +345,27 @@ export default function CoursesSelector(){
           <div className="course-preview" onClick={() => courseClick(department, course.name)}>
 
 
-          <div className="ratings-parent">
-          <div className="rating-container">
-              <p className="rating-label">Quality:</p>
-              <div className="rating-box" style={{backgroundColor: colors[Math.round(course.avgQuality)]}}>
-                <p className="rating-box-num">{course.avgQuality > 0 ? course.avgQuality.toFixed(1) : 'N/A'}</p>
-              </div>
+          <div className="course-stats-container">
+            <div className="ratings-parent">
+              <div className="rating-container">
+                  <p className="rating-label">Quality:</p>
+                  <div className="rating-box" style={{backgroundColor: colors[Math.round(course.avgQuality)]}}>
+                    <p className="rating-box-num">{course.avgQuality > 0 ? course.avgQuality.toFixed(1) : 'N/A'}</p>
+                  </div>
+                </div>
+                <div className="rating-container">
+                  <p className="rating-label">Difficulty:</p>
+                  <div className="rating-box" style={{backgroundColor: (course.avgDifficulty === 0 ? "#D3D3D3" : difficultColors[Math.round(course.avgDifficulty)])}}>
+                    <p className="rating-box-num">{course.avgDifficulty > 0 ? course.avgDifficulty.toFixed(1) : 'N/A'}</p>
+                  </div>
+                </div>
             </div>
-            <div className="rating-container">
-              <p className="rating-label">Difficulty:</p>
-              <div className="rating-box" style={{backgroundColor: (course.avgDifficulty === 0 ? "#D3D3D3" : difficultColors[Math.round(course.avgDifficulty)])}}>
-                <p className="rating-box-num">{course.avgDifficulty > 0 ? course.avgDifficulty.toFixed(1) : 'N/A'}</p>
-              </div>
-            </div>
+            {course.numScores > 0 &&
+              <div className="review-num-display">{course.numScores} reviews</div>
+            }
+            
           </div>
+
 
 
 

@@ -13,7 +13,7 @@ function AboutBtn() {
   return (
     <div className="abt-container" onClick={handleClick}>
       <img src={informationButton} alt="Information Button" id="info-img"/>
-      <p className="abt-btn-text">About/Improve</p>
+      <p className="abt-btn-text">About</p>
     </div>
   );
 }

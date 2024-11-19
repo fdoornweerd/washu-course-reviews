@@ -180,6 +180,7 @@ export default function WriteReview() {
       comment: '',
     });
     const encodedName = encodeURIComponent(name);
+    sessionStorage.removeItem('savedCourses');
     navigate(`/${department}/${encodedName}`);
   };
 

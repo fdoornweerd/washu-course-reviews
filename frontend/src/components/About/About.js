@@ -58,15 +58,15 @@ export default function About() {
         </div> 
 
         <form class='container' onSubmit={handleSubmit}>
-            <div><strong>TLDR: Tell me what could me added/improved</strong></div>
+            <div><strong>About & Improve</strong></div>
 
             <br></br>
 
             <div>
             Hey, my name is Finn Doornweerd and I created and maintain this website which is used for helping WashU students 
             find courses and review the courses they have taken. You can filter courses based on quality, difficulty, 
-            and attributes, and search for courses based on professor, code, name, and keywords of things you may 
-            be interested in. When looking at reviews, you can filter by professor and view their RateMyProfessor page.
+            and attributes, as well as search for courses based on professor, code, name, and keywords of things you may 
+            be interested in. When looking at reviews, you can filter by professor and view their Rate My Professor page.
              <br></br>
              <br></br>
             If there are any ways that the website could be improved or ideas about features that would be helpful please submit 

@@ -13,7 +13,7 @@ class DB {
         
         try {
             this.client = await MongoClient.connect(uri);
-            this.db = this.client.db('RateMyCourse');
+            this.db = this.client.db('RateMyCourseBACKUP_2024-11-19');
         } catch (error) {
             console.error('Unable to connect to the database:', error);
         }
